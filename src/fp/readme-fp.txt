@@ -42,6 +42,6 @@ perceived deficiencies or errors. These may then be resolved by
 discussion and the test programs amended.
 
 3. Please feedback comments/complaints etc to:
-        gwj@southwalesldwa.org
+        gerry@jackson9000.fsnet.co.uk
    or post them on the Forth 200X discussion group:
         http://tech.groups.yahoo.com/group/forth200x/
