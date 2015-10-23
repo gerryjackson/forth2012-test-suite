@@ -11,7 +11,8 @@
 \ The tests are not claimed to be comprehensive or correct 
 
 \ ------------------------------------------------------------------------------
-\ Version 0.10 3 August 2014 Name changes to remove redefinition messages
+\ Version 0.13 Interpretive use of S" replaced by S" in colon definitions
+\         0.10 3 August 2014 Name changes to remove redefinition messages
 \               "list" changed to "wordlist" in message for ORDER tests
 \         0.5 1 April 2012  Tests placed in the public domain.
 \         0.4 6 March 2009 { and } replaced with T{ and }T
@@ -121,18 +122,22 @@ TESTING SEARCH-WORDLIST WORDLIST FIND
 
 ONLY FORTH DEFINITIONS
 VARIABLE XT  ' DUP XT !
-VARIABLE XTI ' .( XTI !    \ Immediate word
+VARIABLE XTI ' ( XTI !    \ Immediate word
 
-T{ S" DUP" WID1 @ SEARCH-WORDLIST -> XT  @ -1 }T
-T{ S" .("  WID1 @ SEARCH-WORDLIST -> XTI @  1 }T
-T{ S" DUP" WID2 @ SEARCH-WORDLIST ->        0 }T
+\ Avoid using S" in interpreter mode as that is a File-Access word set extension
+: S"DUP"  S" DUP" ;
+: S"("  S" (" ;
+
+T{ S"DUP" WID1 @ SEARCH-WORDLIST -> XT  @ -1 }T
+T{ S"("   WID1 @ SEARCH-WORDLIST -> XTI @  1 }T
+T{ S"DUP" WID2 @ SEARCH-WORDLIST ->        0 }T
 
 : C"DUP" C" DUP" ;
-: C".("  C" .(" ;
+: C"("  C" (" ;
 : C"X" C" UNKNOWN WORD"  ;
 
 T{ C"DUP" FIND -> XT  @ -1 }T
-T{ C".("  FIND -> XTI @  1 }T
+T{ C"("  FIND -> XTI @  1 }T
 T{ C"X"   FIND -> C"X"   0 }T
 
 \ ------------------------------------------------------------------------------
@@ -156,9 +161,10 @@ T{ W2 -> -9876 }T
 ONLY FORTH DEFINITIONS
 
 : SO5  DUP IF SWAP EXECUTE THEN ;
+: S"W2" S" W2" ;
 
-T{ S" W2" WID1 @ SEARCH-WORDLIST SO5 -> -1  1234 }T
-T{ S" W2" WID2 @ SEARCH-WORDLIST SO5 ->  1 -9876 }T
+T{ S"W2" WID1 @ SEARCH-WORDLIST SO5 -> -1  1234 }T
+T{ S"W2" WID2 @ SEARCH-WORDLIST SO5 ->  1 -9876 }T
 
 : C"W2" C" W2" ;
 T{ ALSOWID2 C"W2" FIND SO5 ->  1 -9876 }T
@@ -179,4 +185,4 @@ SEARCHORDER-ERRORS SET-ERROR-COUNT
 
 CR .( End of Search Order word tests) CR
 
-ONLY FORTH DEFINITIONS		\ Leave search order in the standard state
+ONLY FORTH DEFINITIONS      \ Leave search order in the standard state
