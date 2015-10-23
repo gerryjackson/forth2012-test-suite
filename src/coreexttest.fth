@@ -11,7 +11,14 @@
 \ The tests are not claimed to be comprehensive or correct 
 
 \ ------------------------------------------------------------------------------
-\ Version 0.11 25 April 2015
+\ Version 0.13 29 September 2015
+\              Calls to COMPARE replaced by new definition STR= to avoid use of
+\              a word from an optional word set
+\              UNUSED tests revised as UNUSED UNUSED = may return FALSE when an
+\              implementation has the data stack sharing unused dataspace.
+\              Double number input dependency removed from the HOLDS tests.
+\              Minor case sensitivities removed in definition names.
+\              0.11 25 April 2015
 \              Added tests for PARSE-NAME HOLDS BUFFER:
 \              S\" tests added
 \              DEFER IS ACTION-OF DEFER! DEFER@ tests added
@@ -57,7 +64,7 @@
 \     \ because it has been extensively used already and is, hence, unnecessary
 \     REFILL and SOURCE-ID from the user input device which are not possible
 \     when testing from a file such as this one
-\     UNUSED as the value returned is system dependent
+\     UNUSED (partially tested) as the value returned is system dependent
 \     Obsolescent words #TIB CONVERT EXPECT QUERY SPAN TIB as they have been
 \     removed from the Forth 200X standard
 
@@ -77,6 +84,29 @@ TESTING TRUE FALSE
 
 T{ TRUE  -> 0 INVERT }T
 T{ FALSE -> 0 }T
+
+\ -----------------------------------------------------------------------------
+\ STR=  to compare (case depenedent) 2 strings to avoid use of COMPARE from
+\ the String word set
+
+: STR=  ( caddr1 u1 caddr2 u2 -- f )   \ f = TRUE if strings are equal
+   ROT OVER <> IF DROP 2DROP FALSE EXIT THEN
+   0 ?DO
+         OVER C@ OVER C@ <> IF 2DROP FALSE UNLOOP EXIT THEN
+         CHAR+ SWAP CHAR+
+     LOOP 2DROP TRUE
+;
+
+: STR1  S" abcd" ;  : STR2 S" abcde" ;
+: STR3  S" abCd" ;  : STR4  S" wbcd"  ;
+: S"" S" " ;
+
+T{ STR1 2DUP STR= -> TRUE }T
+T{ STR2 2DUP STR= -> TRUE }T
+T{ S""  2DUP STR= -> TRUE }T
+T{ STR1 STR2 STR= -> FALSE }T
+T{ STR1 STR3 STR= -> FALSE }T
+T{ STR1 STR4 STR= -> FALSE }T
 
 \ -----------------------------------------------------------------------------
 TESTING <> U>   (contributed by James Bowman)
@@ -294,10 +324,12 @@ T{ MAX-INT MAX-INT MAX-INT WITHIN -> <FALSE> }T
 \ -----------------------------------------------------------------------------
 TESTING UNUSED  (contributed by James Bowman & Peter Knaggs)
 
+VARIABLE UNUSED0
 T{ UNUSED DROP -> }T                  
-T{ ALIGN UNUSED 0 , UNUSED CELL+ = -> TRUE }T
-T{ UNUSED 0 C, UNUSED CHAR+ = -> TRUE }T  \ aligned -> unaligned
-T{ UNUSED 0 C, UNUSED CHAR+ = -> TRUE }T  \ unaligned -> ?
+T{ ALIGN UNUSED UNUSED0 ! 0 , UNUSED CELL+ UNUSED0 @ = -> TRUE }T
+T{ UNUSED UNUSED0 ! 0 C, UNUSED CHAR+ UNUSED0 @ =
+         -> TRUE }T  \ aligned -> unaligned
+T{ UNUSED UNUSED0 ! 0 C, UNUSED CHAR+ UNUSED0 @ = -> TRUE }T  \ unaligned -> ?
 
 \ -----------------------------------------------------------------------------
 TESTING AGAIN   (contributed by James Bowman)
@@ -519,7 +551,7 @@ TESTING SAVE-INPUT and RESTORE-INPUT with a file source
 VARIABLE SIV -1 SIV !
 
 : NEVEREXECUTED
-	CR ." This should never be executed" CR
+   CR ." This should never be executed" CR
 ;
 
 T{ 11111 SAVE-INPUT
@@ -527,10 +559,10 @@ T{ 11111 SAVE-INPUT
 SIV @
 
 [IF]
-	0 SIV !
-	RESTORE-INPUT
-	NEVEREXECUTED
-	33333
+   0 SIV !
+   RESTORE-INPUT
+   NEVEREXECUTED
+   33333
 [ELSE]
 
 TESTING the -[ELSE]- part is executed
@@ -538,15 +570,15 @@ TESTING the -[ELSE]- part is executed
 
 [THEN]
 
-   -> 11111 0 22222 }T	\ 0 comes from RESTORE-INPUT
+   -> 11111 0 22222 }T   \ 0 comes from RESTORE-INPUT
 
 TESTING SAVE-INPUT and RESTORE-INPUT with a string source
 
 VARIABLE SI_INC 0 SI_INC !
 
 : SI1
-	SI_INC @ >IN +!
-	15 SI_INC !
+   SI_INC @ >IN +!
+   15 SI_INC !
 ;
 
 : S$ S" SAVE-INPUT SI1 RESTORE-INPUT 12345" ;
@@ -556,8 +588,8 @@ T{ S$ EVALUATE SI_INC @ -> 0 2345 15 }T
 TESTING nested SAVE-INPUT, RESTORE-INPUT and REFILL from a file
 
 : READ_A_LINE
-	REFILL 0=
-	ABORT" REFILL FAILED"
+   REFILL 0=
+   ABORT" REFILL FAILED"
 ;
 
 0 SI_INC !
@@ -565,21 +597,21 @@ TESTING nested SAVE-INPUT, RESTORE-INPUT and REFILL from a file
 2VARIABLE 2RES -1. 2RES 2!
 
 : SI2
-	READ_A_LINE
-	READ_A_LINE
-	SAVE-INPUT
-	READ_A_LINE
-	READ_A_LINE
-	S$ EVALUATE 2RES 2!
-	RESTORE-INPUT
+   READ_A_LINE
+   READ_A_LINE
+   SAVE-INPUT
+   READ_A_LINE
+   READ_A_LINE
+   S$ EVALUATE 2RES 2!
+   RESTORE-INPUT
 ;
 
 \ WARNING: do not delete or insert lines of text after si2 is called
 \ otherwise the next test will fail
 
 T{ SI2
-33333					\ This line should be ignored
-2RES 2@ 44444		\ RESTORE-INPUT should return to this line
+33333               \ This line should be ignored
+2RES 2@ 44444      \ RESTORE-INPUT should return to this line
 
 55555
 TESTING the nested results
@@ -596,7 +628,7 @@ T{ CR .( and again: ).( -9876)CR -> }T
 
 CR CR .( On the next 2 lines you should see First then Second messages:)
 T{ : DOTP  CR ." Second message via ." [CHAR] " EMIT    \ Check .( is immediate
-     [ CR ] .( First message via .( ) ; dotp -> }T
+     [ CR ] .( First message via .( ) ; DOTP -> }T
 CR CR
 T{ : IMM? BL WORD FIND NIP ; IMM? .( -> 1 }T
 
@@ -681,8 +713,8 @@ T{ CHAR " PARSE 4567 "DUP ROT ROT EVALUATE -> 5 4567 }T
 TESTING PARSE-NAME  (Forth 2012)
 \ Adapted from the PARSE-NAME RfD tests
 
-T{ PARSE-NAME abcd  s" abcd"  COMPARE -> 0 }T        \ No leading spaces
-T{ PARSE-NAME      abcde s" abcde" COMPARE -> 0 }T   \ Leading spaces
+T{ PARSE-NAME abcd  STR1  STR= -> TRUE }T        \ No leading spaces
+T{ PARSE-NAME      abcde STR2 STR= -> TRUE }T    \ Leading spaces
 
 \ Test empty parse area, new lines are necessary
 T{ PARSE-NAME
@@ -692,15 +724,15 @@ T{ PARSE-NAME
   NIP -> 0 }T
 
 T{ : PARSE-NAME-TEST ( "name1" "name2" -- n )
-    PARSE-NAME PARSE-NAME COMPARE ; -> }T
-T{ PARSE-NAME-TEST abcd  abcd  -> 0 }T
-T{ PARSE-NAME-TEST abcd  abcd  -> 0 }T
-T{ PARSE-NAME-TEST abcde abcdf -> -1 }T
-T{ PARSE-NAME-TEST abcdf abcde -> 1 }T
+    PARSE-NAME PARSE-NAME STR= ; -> }T
+T{ PARSE-NAME-TEST abcd abcd  -> TRUE }T
+T{ PARSE-NAME-TEST abcd   abcd  -> TRUE }T  \ Leading spaces
+T{ PARSE-NAME-TEST abcde abcdf -> FALSE }T
+T{ PARSE-NAME-TEST abcdf abcde -> FALSE }T
 T{ PARSE-NAME-TEST abcde abcde
-  -> 0 }T
-T{ PARSE-NAME-TEST abcde abcde
-  -> 0 }T
+   -> TRUE }T         \ Parse to end of line
+T{ PARSE-NAME-TEST abcde           abcde         
+   -> TRUE }T         \ Leading and trailing spaces
 
 \ -----------------------------------------------------------------------------
 TESTING DEFER DEFER@ DEFER! IS ACTION-OF (Forth 2012)
@@ -742,10 +774,11 @@ TESTING HOLDS  (Forth 2012)
 : HTEST S" Testing HOLDS" ;
 : HTEST2 S" works" ;
 : HTEST3 S" Testing HOLDS works 123" ;
-T{ 0. <#  HTEST HOLDS #> HTEST COMPARE -> 0 }T
-T{ 123. <# #S BL HOLD HTEST2 HOLDS BL HOLD htest HOLDS #>  HTEST3 COMPARE -> 0 }T
+T{ 0 0 <#  HTEST HOLDS #> HTEST STR= -> TRUE }T
+T{ 123 0 <# #S BL HOLD HTEST2 HOLDS BL HOLD htest HOLDS #>
+   HTEST3 STR= -> TRUE }T
 T{ : HLD HOLDS ; -> }T
-T{ 0. <#  HTEST HLD #> HTEST COMPARE -> 0 }T
+T{ 0 0 <#  HTEST HLD #> HTEST STR= -> TRUE }T
 
 \ -----------------------------------------------------------------------------
 TESTING REFILL SOURCE-ID
@@ -762,8 +795,8 @@ TESTING S\"  (Forth 2012 compilation mode)
 \ interpretation semantics. S\" in interpretation mode is tested in the tests on
 \ the File-Access word set
 
-T{ : SSQ1 S\" abc" s" abc" COMPARE ; -> }T  \ No escapes
-T{ SSQ1 -> 0 }T
+T{ : SSQ1 S\" abc" S" abc" STR= ; -> }T  \ No escapes
+T{ SSQ1 -> TRUE }T
 T{ : SSQ2 S\" " ; SSQ2 SWAP DROP -> 0 }T    \ Empty string
 
 T{ : SSQ3 S\" \a\b\e\f\l\m\q\r\t\v\x0F0\x1Fa\xaBx\z\"\\" ; -> }T
@@ -797,9 +830,9 @@ CR .( another line)
 T{ : SSQ4 S\" \nOne line...\nanotherLine\n" type ; SSQ4 -> }T
 
 \ Test bare escapable characters appear as themselves
-t{ : SSQ5 s\" abeflmnqrtvxz" ; SSQ5 s" abeflmnqrtvxz" COMPARE -> 0 }t
+t{ : SSQ5 S\" abeflmnqrtvxz" S" abeflmnqrtvxz" STR= ; SSQ5 -> TRUE }t
 
-t{ : SSQ6 s\" a\""2DROP 1111 ; SSQ6 -> 1111 }t \ Parsing behaviour
+t{ : SSQ6 S\" a\""2DROP 1111 ; SSQ6 -> 1111 }t \ Parsing behaviour
 
 T{ : SSQ7  S\" 111 : SSQ8 s\\\" 222\" EVALUATE ; SSQ8 333" EVALUATE ; -> }T
 T{ SSQ7 -> 111 222 333 }T
