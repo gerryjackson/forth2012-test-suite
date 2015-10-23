@@ -81,7 +81,7 @@
 BASE @
 DECIMAL
 
-VARIABLE ACTUAL-DEPTH			\ stack record
+VARIABLE ACTUAL-DEPTH         \ stack record
 CREATE ACTUAL-RESULTS 32 CELLS ALLOT
 VARIABLE START-DEPTH
 VARIABLE XCURSOR      \ for ...}T
@@ -242,7 +242,7 @@ HAS-FLOATING-STACK [IF]
     [THEN]
 [THEN]    
 
-: EMPTY-STACK	\ ( ... -- ) empty stack; handles underflowed stack too.
+: EMPTY-STACK   \ ( ... -- ) empty stack; handles underflowed stack too.
     DEPTH START-DEPTH @ < IF
         DEPTH START-DEPTH @ SWAP DO 0 LOOP
     THEN
@@ -251,35 +251,35 @@ HAS-FLOATING-STACK [IF]
     THEN
     EMPTY-FSTACK ;
 
-: ERROR1	\ ( C-ADDR U -- ) display an error message 
-		\ followed by the line that had the error.
-   TYPE SOURCE TYPE CR			\ display line corresponding to error
-   EMPTY-STACK				   \ throw away everything else
+: ERROR1   \ ( C-ADDR U -- ) display an error message 
+      \ followed by the line that had the error.
+   TYPE SOURCE TYPE CR         \ display line corresponding to error
+   EMPTY-STACK               \ throw away everything else
    #ERRORS @ 1 + #ERRORS ! \ update error count
 ;
 
 ' ERROR1 ERROR-XT !
 
-: T{		\ ( -- ) syntactic sugar.
+: T{      \ ( -- ) syntactic sugar.
    DEPTH START-DEPTH ! 0 XCURSOR ! F{ ;
 
-: ->		\ ( ... -- ) record depth and contents of stack.
-   DEPTH DUP ACTUAL-DEPTH !		\ record depth
-   START-DEPTH @ > IF		\ if there is something on the stack
+: ->      \ ( ... -- ) record depth and contents of stack.
+   DEPTH DUP ACTUAL-DEPTH !      \ record depth
+   START-DEPTH @ > IF      \ if there is something on the stack
        DEPTH START-DEPTH @ - 0 DO ACTUAL-RESULTS I CELLS + ! LOOP \ save them
    THEN
    F-> ;
 
-: }T		\ ( ... -- ) COMPARE STACK (EXPECTED) CONTENTS WITH SAVED
-		\ (ACTUAL) CONTENTS.
-   DEPTH ACTUAL-DEPTH @ = IF		\ if depths match
-      DEPTH START-DEPTH @ > IF		\ if there is something on the stack
-         DEPTH START-DEPTH @ - 0 DO	\ for each stack item
-	    ACTUAL-RESULTS I CELLS + @	\ compare actual with expected
-	    <> IF S" INCORRECT RESULT: " ERROR LEAVE THEN
-	 LOOP
+: }T      \ ( ... -- ) COMPARE STACK (EXPECTED) CONTENTS WITH SAVED
+      \ (ACTUAL) CONTENTS.
+   DEPTH ACTUAL-DEPTH @ = IF      \ if depths match
+      DEPTH START-DEPTH @ > IF      \ if there is something on the stack
+         DEPTH START-DEPTH @ - 0 DO   \ for each stack item
+       ACTUAL-RESULTS I CELLS + @   \ compare actual with expected
+       <> IF S" INCORRECT RESULT: " ERROR LEAVE THEN
+    LOOP
       THEN
-   ELSE					\ depth mismatch
+   ELSE               \ depth mismatch
       S" WRONG NUMBER OF RESULTS: " ERROR
    THEN
    F} ;
@@ -339,7 +339,7 @@ HAS-FLOATING [IF]
 VARIABLE VERBOSE
    FALSE VERBOSE !
 
-: TESTING	\ ( -- ) TALKING COMMENT.
+: TESTING   \ ( -- ) TALKING COMMENT.
    SOURCE VERBOSE @
    IF DUP >R TYPE CR R> >IN !
    ELSE >IN ! DROP

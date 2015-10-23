@@ -60,7 +60,7 @@ T{ ADDR1 @ FREE -> 0 }T
 
 T{ 50 CHARS ALLOCATE SWAP ADDR1 ! -> 0 }T
 
-: WRITEMEM 0 DO I 1+ OVER C! CHAR+ LOOP DROP ;	( ad n -- )
+: WRITEMEM 0 DO I 1+ OVER C! CHAR+ LOOP DROP ;   ( ad n -- )
 
 \ CHECKMEM is defined this way to maintain compatibility with both
 \ tester.fr and ttester.fs which differ in their definitions of T{

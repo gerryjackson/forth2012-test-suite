@@ -38,29 +38,29 @@ DECIMAL
 
 : T1 9 ;
 : C1 1 2 3 ['] T1 CATCH ;
-T{ C1 -> 1 2 3 9 0 }T			\ No THROW executed
+T{ C1 -> 1 2 3 9 0 }T         \ No THROW executed
 
 : T2 8 0 THROW ;
 : C2 1 2 ['] T2 CATCH ;
-T{ C2 -> 1 2 8 0 }T				\ 0 THROW does nothing
+T{ C2 -> 1 2 8 0 }T            \ 0 THROW does nothing
 
 : T3 7 8 9 99 THROW ;
 : C3 1 2 ['] T3 CATCH ;
-T{ C3 -> 1 2 99 }T				\ Restores stack to CATCH depth
+T{ C3 -> 1 2 99 }T            \ Restores stack to CATCH depth
 
 : T4 1- DUP 0> IF RECURSE ELSE 999 THROW -222 THEN ;
 : C4 3 4 5 10 ['] T4 CATCH -111 ;
-T{ C4 -> 3 4 5 0 999 -111 }T	\ Test return stack unwinding
+T{ C4 -> 3 4 5 0 999 -111 }T   \ Test return stack unwinding
 
 : T5 2DROP 2DROP 9999 THROW ;
-: C5 1 2 3 4 ['] T5 CATCH				\ Test depth restored correctly
-	DEPTH >R DROP 2DROP 2DROP R> ;	\ after stack has been emptied
+: C5 1 2 3 4 ['] T5 CATCH            \ Test depth restored correctly
+   DEPTH >R DROP 2DROP 2DROP R> ;   \ after stack has been emptied
 T{ C5 -> 5 }T
 
 \ ------------------------------------------------------------------------------
 TESTING ABORT ABORT"
 
--1	CONSTANT EXC_ABORT
+-1   CONSTANT EXC_ABORT
 -2 CONSTANT EXC_ABORT"
 -13 CONSTANT EXC_UNDEF
 : T6 ABORT ;
@@ -71,14 +71,14 @@ TESTING ABORT ABORT"
 
 : T10 77 SWAP ABORT" This should not be displayed" ;
 : C6 CATCH
-	CASE EXC_ABORT  OF 11 ENDOF
-	     EXC_ABORT" OF 12 ENDOF
+   CASE EXC_ABORT  OF 11 ENDOF
+        EXC_ABORT" OF 12 ENDOF
        EXC_UNDEF  OF 13 ENDOF
-	ENDCASE
+   ENDCASE
 ;
 
 T{ 1 2 ' T6 C6  -> 1 2 11 }T     \ Test that ABORT is caught
-T{ 3 0 ' T10 C6 -> 3 77 }T	      \ ABORT" does nothing
+T{ 3 0 ' T10 C6 -> 3 77 }T         \ ABORT" does nothing
 T{ 4 5 ' T10 C6 -> 4 77 12 }T    \ ABORT" caught, no message
 
 \ ------------------------------------------------------------------------------
@@ -88,7 +88,7 @@ TESTING a system generated exception
 : T8 S" 222 T7 223" EVALUATE 224 ;
 : T9 S" 111 112 T8 113" EVALUATE 114 ;
 
-T{ 6 7 ' T9 C6 3 -> 6 7 13 3 }T			\ Test unlinking of sources
+T{ 6 7 ' T9 C6 3 -> 6 7 13 3 }T         \ Test unlinking of sources
 
 \ ------------------------------------------------------------------------------
 

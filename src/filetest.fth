@@ -185,7 +185,7 @@ T{ FN3 FILE-STATUS SWAP DROP 0= -> TRUE }T  \ Return value is undefined
 T{ FN3 R/W OPEN-FILE SWAP FID1 ! -> 0 }T
 T{ >END -> 0 }T
 T{ S" Final line" fid1 @ WRITE-LINE -> 0 }T
-T{ FID1 @ FLUSH-FILE -> 0 }T		\ Can only test FLUSH-FILE doesn't fail
+T{ FID1 @ FLUSH-FILE -> 0 }T      \ Can only test FLUSH-FILE doesn't fail
 T{ FID1 @ CLOSE-FILE -> 0 }T
 
 \ Tidy the test folder
