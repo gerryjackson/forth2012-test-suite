@@ -11,9 +11,11 @@
 \ The tests are not claimed to be comprehensive or correct 
 
 \ ------------------------------------------------------------------------------
-\ Version 0.13 29 September 2015
+\ Version 0.13 28 October 2015
+\              Use of 2VARIABLE (from optional wordset) replaced with CREATE.
+\              Minor lower to upper case conversions.
 \              Calls to COMPARE replaced by new definition STR= to avoid use of
-\              a word from an optional word set
+\              a word from an optional word set.
 \              UNUSED tests revised as UNUSED UNUSED = may return FALSE when an
 \              implementation has the data stack sharing unused dataspace.
 \              Double number input dependency removed from the HOLDS tests.
@@ -594,7 +596,7 @@ TESTING nested SAVE-INPUT, RESTORE-INPUT and REFILL from a file
 
 0 SI_INC !
 
-2VARIABLE 2RES -1. 2RES 2!
+CREATE 2RES -1 , -1 ,   \ Don't use 2VARIABLE from Double number word set 
 
 : SI2
    READ_A_LINE
@@ -775,7 +777,7 @@ TESTING HOLDS  (Forth 2012)
 : HTEST2 S" works" ;
 : HTEST3 S" Testing HOLDS works 123" ;
 T{ 0 0 <#  HTEST HOLDS #> HTEST STR= -> TRUE }T
-T{ 123 0 <# #S BL HOLD HTEST2 HOLDS BL HOLD htest HOLDS #>
+T{ 123 0 <# #S BL HOLD HTEST2 HOLDS BL HOLD HTEST HOLDS #>
    HTEST3 STR= -> TRUE }T
 T{ : HLD HOLDS ; -> }T
 T{ 0 0 <#  HTEST HLD #> HTEST STR= -> TRUE }T
@@ -830,9 +832,9 @@ CR .( another line)
 T{ : SSQ4 S\" \nOne line...\nanotherLine\n" type ; SSQ4 -> }T
 
 \ Test bare escapable characters appear as themselves
-t{ : SSQ5 S\" abeflmnqrtvxz" S" abeflmnqrtvxz" STR= ; SSQ5 -> TRUE }t
+T{ : SSQ5 S\" abeflmnqrtvxz" S" abeflmnqrtvxz" STR= ; SSQ5 -> TRUE }T
 
-t{ : SSQ6 S\" a\""2DROP 1111 ; SSQ6 -> 1111 }t \ Parsing behaviour
+T{ : SSQ6 S\" a\""2DROP 1111 ; SSQ6 -> 1111 }T \ Parsing behaviour
 
 T{ : SSQ7  S\" 111 : SSQ8 s\\\" 222\" EVALUATE ; SSQ8 333" EVALUATE ; -> }T
 T{ SSQ7 -> 111 222 333 }T
