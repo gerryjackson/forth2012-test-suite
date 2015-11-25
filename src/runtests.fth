@@ -4,14 +4,17 @@
 \ Select the appropriate test harness, either the simple tester.fr
 \ or the more complex ttester.fs 
 
-CR .( Running ANS Forth and Forth 2012 test programs, version 0.12) CR
+CR .( Running ANS Forth and Forth 2012 test programs, version 0.13) CR
 
 S" tester.fr" INCLUDED
 \ S" ttester.fs" INCLUDED
+
 S" core.fr" INCLUDED
 S" coreplustest.fth" INCLUDED
 S" errorreport.fth" INCLUDED
+S" utilities.fth" INCLUDED
 S" coreexttest.fth" INCLUDED
+\ S" blocktest.fth" INCLUDED
 S" doubletest.fth" INCLUDED
 S" exceptiontest.fth" INCLUDED
 S" facilitytest.fth" INCLUDED
