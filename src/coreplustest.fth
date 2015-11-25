@@ -11,7 +11,9 @@
 \ The tests are not claimed to be comprehensive or correct 
 
 \ ------------------------------------------------------------------------------
-\ Version 0.12 22 July 2015, >IN Manipulation test modified to work on 16 bit
+\ Version 0.13 TRUE changed to <TRUE>, MAX-INT etc renamed to MAX_INT etc to
+\              use Core definitions
+\         0.12 22 July 2015, >IN Manipulation test modified to work on 16 bit
 \              Forth systems
 \         0.11 25 April 2015 Number prefixes # $ % and 'c' character input tested
 \         0.10 3 August 2014 Test IMMEDIATE doesn't toggle an immediate flag
@@ -37,8 +39,8 @@
 \ ------------------------------------------------------------------------------
 \ Assumptions and dependencies:
 \     - tester.fr or ttester.fs has been loaded prior to this file
-\     - core.fr has been loaded so that constants MAX-INT, MIN-INT and
-\       MAX-UINT are defined
+\     - core.fr has been loaded so that constants <TRUE>, MAX_INT, MIN_INT and
+\       MAX_UINT are defined
 \ ------------------------------------------------------------------------------
 
 DECIMAL
@@ -83,57 +85,57 @@ TESTING DO +LOOP with large and small increments
 
 \ Contributed by Andrew Haley
 
-MAX-UINT 8 RSHIFT 1+ CONSTANT USTEP
+MAX_UINT 8 RSHIFT 1+ CONSTANT USTEP
 USTEP NEGATE CONSTANT -USTEP
-MAX-INT 7 RSHIFT 1+ CONSTANT STEP
+MAX_INT 7 RSHIFT 1+ CONSTANT STEP
 STEP NEGATE CONSTANT -STEP
 
 VARIABLE BUMP
 
 T{ : GD8 BUMP ! DO 1+ BUMP @ +LOOP ; -> }T
 
-T{ 0 MAX-UINT 0 USTEP GD8 -> 256 }T
-T{ 0 0 MAX-UINT -USTEP GD8 -> 256 }T
+T{ 0 MAX_UINT 0 USTEP GD8 -> 256 }T
+T{ 0 0 MAX_UINT -USTEP GD8 -> 256 }T
 
-T{ 0 MAX-INT MIN-INT STEP GD8 -> 256 }T
-T{ 0 MIN-INT MAX-INT -STEP GD8 -> 256 }T
+T{ 0 MAX_INT MIN_INT STEP GD8 -> 256 }T
+T{ 0 MIN_INT MAX_INT -STEP GD8 -> 256 }T
 
 \ Two's complement arithmetic, wraps around modulo wordsize
 \ Only tested if the Forth system does wrap around, use of conditional
 \ compilation deliberately avoided
 
-MAX-INT 1+ MIN-INT = CONSTANT +WRAP?
-MIN-INT 1- MAX-INT = CONSTANT -WRAP?
-MAX-UINT 1+ 0=       CONSTANT +UWRAP?
-0 1- MAX-UINT =      CONSTANT -UWRAP?
+MAX_INT 1+ MIN_INT = CONSTANT +WRAP?
+MIN_INT 1- MAX_INT = CONSTANT -WRAP?
+MAX_UINT 1+ 0=       CONSTANT +UWRAP?
+0 1- MAX_UINT =      CONSTANT -UWRAP?
 
 : GD9  ( n limit start step f result -- )
    >R IF GD8 ELSE 2DROP 2DROP R@ THEN -> R> }T
 ;
 
-T{ 0 0 0  USTEP +UWRAP? 256 GD9
+T{ 0 0 0  USTEP +UWRAP? 256 GD9     \ -> ... }T is executed in GD9
 T{ 0 0 0 -USTEP -UWRAP?   1 GD9
-T{ 0 MIN-INT MAX-INT  STEP +WRAP? 1 GD9
-T{ 0 MAX-INT MIN-INT -STEP -WRAP? 1 GD9
+T{ 0 MIN_INT MAX_INT  STEP +WRAP? 1 GD9
+T{ 0 MAX_INT MIN_INT -STEP -WRAP? 1 GD9
 
 \ ------------------------------------------------------------------------------
 TESTING DO +LOOP with maximum and minimum increments
 
-: (-MI) MAX-INT DUP NEGATE + 0= IF MAX-INT NEGATE ELSE -32767 THEN ;
-(-MI) CONSTANT -MAX-INT
+: (-MI) MAX_INT DUP NEGATE + 0= IF MAX_INT NEGATE ELSE -32767 THEN ;
+(-MI) CONSTANT -MAX_INT
 
-T{ 0 1 0 MAX-INT GD8  -> 1 }T
-T{ 0 -MAX-INT NEGATE -MAX-INT OVER GD8  -> 2 }T
+T{ 0 1 0 MAX_INT GD8  -> 1 }T
+T{ 0 -MAX_INT NEGATE -MAX_INT OVER GD8  -> 2 }T
 
-T{ 0 MAX-INT  0 MAX-INT GD8  -> 1 }T
-T{ 0 MAX-INT  1 MAX-INT GD8  -> 1 }T
-T{ 0 MAX-INT -1 MAX-INT GD8  -> 2 }T
-T{ 0 MAX-INT DUP 1- MAX-INT GD8  -> 1 }T
+T{ 0 MAX_INT  0 MAX_INT GD8  -> 1 }T
+T{ 0 MAX_INT  1 MAX_INT GD8  -> 1 }T
+T{ 0 MAX_INT -1 MAX_INT GD8  -> 2 }T
+T{ 0 MAX_INT DUP 1- MAX_INT GD8  -> 1 }T
 
-T{ 0 MIN-INT 1+   0 MIN-INT GD8  -> 1 }T
-T{ 0 MIN-INT 1+  -1 MIN-INT GD8  -> 1 }T
-T{ 0 MIN-INT 1+   1 MIN-INT GD8  -> 2 }T
-T{ 0 MIN-INT 1+ DUP MIN-INT GD8  -> 1 }T
+T{ 0 MIN_INT 1+   0 MIN_INT GD8  -> 1 }T
+T{ 0 MIN_INT 1+  -1 MIN_INT GD8  -> 1 }T
+T{ 0 MIN_INT 1+   1 MIN_INT GD8  -> 2 }T
+T{ 0 MIN_INT 1+ DUP MIN_INT GD8  -> 1 }T
 
 \ ------------------------------------------------------------------------------
 TESTING multiple RECURSEs in one colon definition
@@ -216,7 +218,7 @@ T{ %-10010110 -> -150 }T
 T{ %-10010110. -> -150. }T
 T{ 'z' -> 122 }T
 \ Check BASE is unchanged
-T{ BASE @ OLD-BASE @ = -> TRUE }T
+T{ BASE @ OLD-BASE @ = -> <TRUE> }T
 
 \ Repeat in Hex mode
 16 OLD-BASE ! 16 BASE !
@@ -234,7 +236,7 @@ T{ %-10010110 -> -96 }T
 T{ %-10010110. -> -96. }T
 T{ 'z' -> 7a }T
 \ Check BASE is unchanged
-T{ BASE @ OLD-BASE @ = -> TRUE }T   \ 2
+T{ BASE @ OLD-BASE @ = -> <TRUE> }T   \ 2
 
 DECIMAL
 \ Check number prefixes in compile mode

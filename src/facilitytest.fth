@@ -11,7 +11,8 @@
 \ The tests are not claimed to be comprehensive or correct 
 
 \ ------------------------------------------------------------------------------
-\ Version 0.11 25 April 2015 Added tests for BEGIN-STRUCTURE END-STRUCTURE +FIELD
+\ Version 0.13 Assumptions and dependencies added
+\         0.11 25 April 2015 Added tests for BEGIN-STRUCTURE END-STRUCTURE +FIELD
 \              FIELD: CFIELD:
 \ -----------------------------------------------------------------------------
 \ The tests are based on John Hayes test program for the core word set
@@ -19,6 +20,11 @@
 \ Words tested in this file are: +FIELD BEGIN-STRUCTURE CFIELD: END-STRUCTURE
 \      FIELD:
 
+\ ------------------------------------------------------------------------------
+\ Assumptions and dependencies:
+\     - tester.fr (or ttester.fs), errorreport.fth and utilities.fth have been
+\       included prior to this file
+\     - the Core word set is available and tested
 \ -----------------------------------------------------------------------------
 TESTING Facility words
 

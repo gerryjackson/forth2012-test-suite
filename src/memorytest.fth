@@ -17,7 +17,7 @@
 \             the assumption that 1 CHARS = 1
 \         0.7 1 April 2012  Tests placed in the public domain.
 \         0.6 30 January 2011 CHECKMEM modified to work with ttester.fs
-\         0.5 30 November 2009 <false> replaced with FALSE
+\         0.5 30 November 2009 <FALSE> replaced with FALSE
 \         0.4 9 March 2009 Aligned test improved and data space pointer tested
 \         0.3 6 March 2009 { and } replaced with T{ and }T
 \         0.2 20 April 2007  ANS Forth words changed to upper case
@@ -25,17 +25,17 @@
 
 \ ------------------------------------------------------------------------------
 \ The tests are based on John Hayes test program for the core word set
-\ and requires those files to have been loaded
 
 \ Words tested in this file are:
 \     ALLOCATE FREE RESIZE
 \     
 \ ------------------------------------------------------------------------------
-\ Assumptions and dependencies:
+\ Assumptions, dependencies and notes:
+\     - tester.fr (or ttester.fs), errorreport.fth and utilities.fth have been
+\       included prior to this file
+\     - the Core word set is available and tested
 \     - that 'addr -1 ALLOCATE' and 'addr -1 RESIZE' will return an error
-\     - tester.fr or ttester.fs has been loaded prior to this file
-\     - testing FREE failing is not done as it is likely to crash the
-\       system
+\     - testing FREE failing is not done as it is likely to crash the system
 \ ------------------------------------------------------------------------------
 
 TESTING Memory-Allocation word set

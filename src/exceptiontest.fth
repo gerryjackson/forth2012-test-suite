@@ -11,7 +11,9 @@
 \ The tests are not claimed to be comprehensive or correct 
 
 \ ------------------------------------------------------------------------------
-\ Version 0.4 1 April 2012  Tests placed in the public domain.
+\ Version 0.13 13 Nov 2015 C6 rewritten to avoid use of CASE etc and hence
+\              dependence on the Core extension word set.     
+\         0.4 1 April 2012  Tests placed in the public domain.
 \         0.3 6 March 2009 { and } replaced with T{ and }T
 \         0.2 20 April 2007 ANS Forth words changed to upper case
 \         0.1 Oct 2006 First version released
@@ -28,7 +30,9 @@
 \       code -13 for a word not found by the text interpreter. The
 \       undefined word used is $$qweqweqwert$$,  if this happens to be
 \       a valid word in your system change the definition of t7 below
-\     - tester.fr or ttester.fs has been loaded prior to this file
+\     - tester.fr (or ttester.fs), errorreport.fth and utilities.fth have been
+\       included prior to this file
+\     - the Core word set available and tested
 \     - CASE, OF, ENDOF and ENDCASE from the core extension wordset
 \       are present and work correctly
 \ ------------------------------------------------------------------------------
@@ -60,25 +64,25 @@ T{ C5 -> 5 }T
 \ ------------------------------------------------------------------------------
 TESTING ABORT ABORT"
 
--1   CONSTANT EXC_ABORT
--2 CONSTANT EXC_ABORT"
+-1  CONSTANT EXC_ABORT
+-2  CONSTANT EXC_ABORT"
 -13 CONSTANT EXC_UNDEF
 : T6 ABORT ;
 
-\ The 77 in t10 is necessary for the second ABORT" test as the data stack
+\ The 77 in T10 is necessary for the second ABORT" test as the data stack
 \ is restored to a depth of 2 when THROW is executed. The 77 ensures the top
 \ of stack value is known for the results check
 
 : T10 77 SWAP ABORT" This should not be displayed" ;
 : C6 CATCH
-   CASE EXC_ABORT  OF 11 ENDOF
-        EXC_ABORT" OF 12 ENDOF
-       EXC_UNDEF  OF 13 ENDOF
-   ENDCASE
+   >R   R@ EXC_ABORT  = IF 11
+   ELSE R@ EXC_ABORT" = IF 12
+   ELSE R@ EXC_UNDEF  = IF 13
+   THEN THEN THEN R> DROP
 ;
 
 T{ 1 2 ' T6 C6  -> 1 2 11 }T     \ Test that ABORT is caught
-T{ 3 0 ' T10 C6 -> 3 77 }T         \ ABORT" does nothing
+T{ 3 0 ' T10 C6 -> 3 77 }T       \ ABORT" does nothing
 T{ 4 5 ' T10 C6 -> 4 77 12 }T    \ ABORT" caught, no message
 
 \ ------------------------------------------------------------------------------

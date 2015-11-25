@@ -11,7 +11,8 @@
 \ The tests are not claimed to be comprehensive or correct 
 
 \ ------------------------------------------------------------------------------
-\ Version 0.13 Interpretive use of S" replaced by S" in colon definitions
+\ Version 0.13  Replaced 2 instances of ?DO with DO
+\               Interpretive use of S" replaced by $" from utilities.fth
 \         0.10 3 August 2014 Name changes to remove redefinition messages
 \               "list" changed to "wordlist" in message for ORDER tests
 \         0.5 1 April 2012  Tests placed in the public domain.
@@ -23,7 +24,6 @@
 
 \ ------------------------------------------------------------------------------
 \ The tests are based on John Hayes test program for the core word set
-\ and requires those files to have been loaded
 
 \ Words tested in this file are:
 \     FORTH-WORDLIST GET-ORDER SET-ORDER ALSO ONLY FORTH GET-CURRENT
@@ -33,8 +33,10 @@
 \           dependent and should be visually inspected
 
 \ ------------------------------------------------------------------------------
-\ Assumptions and dependencies:
-\     - tester.fr or ttester.fs has been loaded prior to this file
+\ Assumptions, dependencies and notes:
+\     - tester.fr (or ttester.fs), errorreport.fth and utilities.fth have been
+\       included prior to this file
+\     - the Core word set is available and tested
 \     - that ONLY FORTH DEFINITIONS will work at the start of the file
 \       to ensure the search order is in a known state
 \ ------------------------------------------------------------------------------
@@ -47,7 +49,8 @@ DECIMAL
 
 VARIABLE WID1  VARIABLE WID2
 
-: SAVE-ORDERLIST ( widn ... wid1 n -> ) DUP , 0 ?DO , LOOP ;
+\ Only execute SAVE-ORDERLIST once
+: SAVE-ORDERLIST ( widn ... wid1 n -> ) DUP , ?DUP IF 0 DO , LOOP THEN ;
 
 \ ------------------------------------------------------------------------------
 TESTING FORTH-WORDLIST GET-ORDER SET-ORDER
@@ -59,9 +62,12 @@ CREATE ORDER-LIST
 T{ GET-ORDER SAVE-ORDERLIST -> }T
 
 : GET-ORDERLIST  ( -- widn ... wid1 n )
-   ORDER-LIST DUP @ CELLS  ( -- ad n )
-   OVER +                  ( -- ad ad' )
-   ?DO I @ -1 CELLS +LOOP  ( -- )
+   ORDER-LIST DUP @ CELLS DUP  ( -- ad n )
+   IF
+      OVER + DO I @ -1 CELLS +LOOP
+   ELSE
+      2DROP 0
+   THEN
 ;
 
 T{ GET-ORDER OVER -> GET-ORDER WID1 @ }T \ Forth wordlist at top
@@ -124,13 +130,12 @@ ONLY FORTH DEFINITIONS
 VARIABLE XT  ' DUP XT !
 VARIABLE XTI ' ( XTI !    \ Immediate word
 
-\ Avoid using S" in interpreter mode as that is a File-Access word set extension
-: S"DUP"  S" DUP" ;
-: S"("  S" (" ;
+\ $" is an equivalent to S" in interpreter mode. It is defined in the file
+\ utilities.fth and used to avoid relying on a File-Access word set extension
 
-T{ S"DUP" WID1 @ SEARCH-WORDLIST -> XT  @ -1 }T
-T{ S"("   WID1 @ SEARCH-WORDLIST -> XTI @  1 }T
-T{ S"DUP" WID2 @ SEARCH-WORDLIST ->        0 }T
+T{ $" DUP" WID1 @ SEARCH-WORDLIST -> XT  @ -1 }T
+T{ $" ("   WID1 @ SEARCH-WORDLIST -> XTI @  1 }T
+T{ $" DUP" WID2 @ SEARCH-WORDLIST ->        0 }T
 
 : C"DUP" C" DUP" ;
 : C"("  C" (" ;
@@ -161,10 +166,9 @@ T{ W2 -> -9876 }T
 ONLY FORTH DEFINITIONS
 
 : SO5  DUP IF SWAP EXECUTE THEN ;
-: S"W2" S" W2" ;
 
-T{ S"W2" WID1 @ SEARCH-WORDLIST SO5 -> -1  1234 }T
-T{ S"W2" WID2 @ SEARCH-WORDLIST SO5 ->  1 -9876 }T
+T{ $" W2" WID1 @ SEARCH-WORDLIST SO5 -> -1  1234 }T
+T{ $" W2" WID2 @ SEARCH-WORDLIST SO5 ->  1 -9876 }T
 
 : C"W2" C" W2" ;
 T{ ALSOWID2 C"W2" FIND SO5 ->  1 -9876 }T

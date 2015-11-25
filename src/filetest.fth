@@ -11,7 +11,11 @@
 \ The tests are not claimed to be comprehensive or correct 
 
 \ ------------------------------------------------------------------------------
-\ Version 0.11 25 April 2015 S\" in interpretation mode test added
+\ Version 0.13 S" in interpretation mode tested.
+\              Added SAVE-INPUT RESTORE-INPUT REFILL in a file, (moved from
+\              coreexttest.fth).
+\              Calls to COMPARE replaced with STR= (in utilities.fth) 
+\         0.11 25 April 2015 S\" in interpretation mode test added
 \              REQUIRED REQUIRE INCLUDE tests added
 \              Two S" and/or S\" buffers availability tested
 \         0.5  1 April 2012  Tests placed in the public domain.
@@ -30,22 +34,24 @@
 \ Words tested in this file are:
 \     ( BIN CLOSE-FILE CREATE-FILE DELETE-FILE FILE-POSITION FILE-SIZE
 \     OPEN-FILE R/O R/W READ-FILE READ-LINE REPOSITION-FILE RESIZE-FILE 
-\     S" SOURCE-ID W/O WRITE-FILE WRITE-LINE 
-\     FILE-STATUS FLUSH-FILE RENAME-FILE 
+\     S" S\" SOURCE-ID W/O WRITE-FILE WRITE-LINE 
+\     FILE-STATUS FLUSH-FILE RENAME-FILE SAVE-INPUT RESTORE-INPUT
+\     REFILL
 
 \ Words not tested:
-\     REFILL INCLUDED INCLUDE-FILE (as these will likely have been
+\     INCLUDED INCLUDE-FILE (as these will likely have been
 \     tested in the execution of the test files)
 \ ------------------------------------------------------------------------------
 \ Assumptions, dependencies and notes:
-\     - tester.fr or ttester.fs has been loaded prior to this file
+\     - tester.fr (or ttester.fs), errorreport.fth and utilities.fth have been
+\       included prior to this file
+\     - the Core word set is available and tested
 \     - These tests create files in the current directory, if all goes
 \       well these will be deleted. If something fails they may not be
 \       deleted. If this is a problem ensure you set a suitable 
 \       directory before running this test. There is no ANS standard
 \       way of doing this. Also be aware of the file names used below
 \       which are:  fatest1.txt, fatest2.txt and fatest3.txt
-\     - TRUE and FALSE are present from the Core extension word set 
 \ ------------------------------------------------------------------------------
 
 TESTING File Access word set
@@ -80,8 +86,15 @@ VARIABLE #CHARS
 T{ FN1 R/O OPEN-FILE SWAP FID1 ! -> 0 }T
 T{ FID1 @ FILE-POSITION -> 0. 0 }T
 T{ BUF 100 FID1 @ READ-LINE ROT DUP #CHARS ! -> TRUE 0 LINE1 SWAP DROP }T
-T{ BUF #CHARS @ LINE1 COMPARE -> 0 }T
+T{ BUF #CHARS @ LINE1 STR= -> TRUE }T
 T{ FID1 @ CLOSE-FILE -> 0 }T
+
+\ ------------------------------------------------------------------------------
+TESTING S" in interpretation mode (compile mode tested in Core tests)
+
+T{ S" abcdef" $" abcdef" STR= -> TRUE }T
+T{ S" " $" " STR= -> TRUE }T
+T{ S" ghi"$" ghi" STR= -> TRUE }T
 
 \ ------------------------------------------------------------------------------
 TESTING R/W WRITE-FILE REPOSITION-FILE READ-FILE FILE-POSITION S"
@@ -99,7 +112,7 @@ T{ FID1 @ FILE-POSITION -> 10. 0 }T
 T{ 0. FID1 @ REPOSITION-FILE -> 0 }T
 T{ RL1 -> LINE1 SWAP DROP TRUE 0 }T
 T{ RL1 ROT DUP #CHARS ! -> TRUE 0 LINE2 SWAP DROP }T
-T{ BUF #CHARS @ LINE2 COMPARE -> 0 }T
+T{ BUF #CHARS @ LINE2 STR= -> TRUE }T
 T{ RL1 -> 0 FALSE 0 }T
 T{ FID1 @ FILE-POSITION ROT ROT FP 2! -> 0 }T
 T{ FP 2@ FID1 @ FILE-SIZE DROP D= -> TRUE }T
@@ -127,10 +140,10 @@ T{ PAD 50 FID2 @ WRITE-FILE FID2 @ FLUSH-FILE -> 0 0 }T
 T{ FID2 @ FILE-SIZE -> 50. 0 }T
 T{ 0. FID2 @ REPOSITION-FILE -> 0 }T
 T{ CBUF BUF 29 FID2 @ READ-FILE -> 29 0 }T
-T{ PAD 29 BUF 29 COMPARE -> 0 }T
-T{ PAD 30 BUF 30 COMPARE -> 1 }T
+T{ PAD 29 BUF 29 STR= -> TRUE }T
+T{ PAD 30 BUF 30 STR= -> FALSE }T
 T{ CBUF BUF 29 FID2 @ READ-FILE -> 21 0 }T
-T{ PAD 29 + 21 BUF 21 COMPARE -> 0 }T
+T{ PAD 29 + 21 BUF 21 STR= -> TRUE }T
 T{ FID2 @ FILE-SIZE DROP FID2 @ FILE-POSITION DROP D= -> TRUE }T
 T{ BUF 10 FID2 @ READ-FILE -> 0 0 }T
 T{ FID2 @ CLOSE-FILE -> 0 }T
@@ -143,13 +156,13 @@ T{ 37. FID2 @ RESIZE-FILE -> 0 }T
 T{ FID2 @ FILE-SIZE -> 37. 0 }T
 T{ 0. FID2 @ REPOSITION-FILE -> 0 }T
 T{ CBUF BUF 100 FID2 @ READ-FILE -> 37 0 }T
-T{ PAD 37 BUF 37 COMPARE -> 0 }T
-T{ PAD 38 BUF 38 COMPARE -> 1 }T
+T{ PAD 37 BUF 37 STR= -> TRUE }T
+T{ PAD 38 BUF 38 STR= -> FALSE }T
 T{ 500. FID2 @ RESIZE-FILE -> 0 }T
 T{ FID2 @ FILE-SIZE -> 500. 0 }T
 T{ 0. FID2 @ REPOSITION-FILE -> 0 }T
 T{ CBUF BUF 100 FID2 @ READ-FILE -> 100 0 }T
-T{ PAD 37 BUF 37 COMPARE -> 0 }T
+T{ PAD 37 BUF 37 STR= -> TRUE }T
 T{ FID2 @ CLOSE-FILE -> 0 }T
 
 \ ------------------------------------------------------------------------------
@@ -213,17 +226,78 @@ TESTING S\" (Forth 2012 interpretation mode)
 
 \ S\" in compilation mode already tested in Core Extension tests
 T{ : SSQ10 S\" \a\b\e\f\l\m\q\r\t\v\x0F0\x1Fa\xaBx\z\"\\" ; -> }T
-T{ S\" \a\b\e\f\l\m\q\r\t\v\x0F0\x1Fa\xaBx\z\"\\" SSQ10  COMPARE -> 0 }T
+T{ S\" \a\b\e\f\l\m\q\r\t\v\x0F0\x1Fa\xaBx\z\"\\" SSQ10  STR= -> TRUE }T
 
 \ ------------------------------------------------------------------------------
-TESTING two buffers available for S" and/or S\"
+TESTING two buffers available for S" and/or S\" (Forth 2012)
 
 : SSQ11 S" abcd" ;   : SSQ12 S" 1234" ;
-T{ S" abcd"  S" 1234" SSQ12  COMPARE ROT ROT SSQ11 COMPARE -> 0 0 }T
-T{ S\" abcd" S\" 1234" SSQ12 COMPARE ROT ROT SSQ11 COMPARE -> 0 0 }T
-T{ S" abcd"  S\" 1234" SSQ12 COMPARE ROT ROT SSQ11 COMPARE -> 0 0 }T
-T{ S\" abcd" S" 1234" SSQ12  COMPARE ROT ROT SSQ11 COMPARE -> 0 0 }T
+T{ S" abcd"  S" 1234" SSQ12  STR= ROT ROT SSQ11 STR= -> TRUE TRUE }T
+T{ S\" abcd" S\" 1234" SSQ12 STR= ROT ROT SSQ11 STR= -> TRUE TRUE }T
+T{ S" abcd"  S\" 1234" SSQ12 STR= ROT ROT SSQ11 STR= -> TRUE TRUE }T
+T{ S\" abcd" S" 1234" SSQ12  STR= ROT ROT SSQ11 STR= -> TRUE TRUE }T
 
+
+\ ------------------------------------------------------------------------------
+TESTING SAVE-INPUT and RESTORE-INPUT with a file source
+
+VARIABLE SIV -1 SIV !
+
+: NEVEREXECUTED
+   CR ." This should never be executed" CR
+;
+
+T{ 11111 SAVE-INPUT
+
+SIV @
+
+[?IF]
+\?   0 SIV !
+\?   RESTORE-INPUT
+\?   NEVEREXECUTED
+\?   33333
+[?ELSE]
+
+\? TESTING the -[ELSE]- part is executed
+\? 22222
+
+[?THEN]
+
+   -> 11111 0 22222 }T   \ 0 comes from RESTORE-INPUT
+
+TESTING nested SAVE-INPUT, RESTORE-INPUT and REFILL from a file
+
+: READ_A_LINE
+   REFILL 0=
+   ABORT" REFILL FAILED"
+;
+
+0 SI_INC !
+
+CREATE 2RES -1 , -1 ,   \ Don't use 2VARIABLE from Double number word set 
+
+: SI2
+   READ_A_LINE
+   READ_A_LINE
+   SAVE-INPUT
+   READ_A_LINE
+   READ_A_LINE
+   S$ EVALUATE 2RES 2!
+   RESTORE-INPUT
+;
+
+\ WARNING: do not delete or insert lines of text after si2 is called
+\ otherwise the next test will fail
+
+T{ SI2
+33333               \ This line should be ignored
+2RES 2@ 44444      \ RESTORE-INPUT should return to this line
+
+55555
+TESTING the nested results
+ -> 0 0 2345 44444 55555 }T
+
+\ End of warning
 
 \ ------------------------------------------------------------------------------
 
