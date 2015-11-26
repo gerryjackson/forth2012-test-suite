@@ -1,4 +1,4 @@
-\ To collect and report on the number of errors resulting from running the 
+\ To collect and report on the number of errors resulting from running the
 \ ANS Forth and Forth 2012 test programs
 
 \ This program was written by Gerry Jackson in 2015, and is in the public
@@ -33,7 +33,7 @@ ERROR-COUNT TOOLS-ERRORS         ERROR-COUNT BLOCK-ERRORS
 CREATE ERRORS[] DUP ALLOT CONSTANT #ERROR-COUNTS
 
 \ SET-ERROR-COUNT called at the end of each test file with its own offset into
-\ the ERRORS[] array. #ERRORS is in files tester.fr and ttester.fs 
+\ the ERRORS[] array. #ERRORS is in files tester.fr and ttester.fs
 
 : SET-ERROR-COUNT  ( offset -- )
    #ERRORS @ SWAP ERRORS[] + !
@@ -42,7 +42,7 @@ CREATE ERRORS[] DUP ALLOT CONSTANT #ERROR-COUNTS
 ;
 
 : INIT-ERRORS  ( -- )
-   ERRORS[] #ERROR-COUNTS OVER + SWAP DO 0 I ! 1 CELLS +LOOP 
+   ERRORS[] #ERROR-COUNTS OVER + SWAP DO -1 I ! 1 CELLS +LOOP
    CORE-ERRORS SET-ERROR-COUNT
    0 TOTAL-ERRORS !
 ;
@@ -55,7 +55,8 @@ INIT-ERRORS
 
 : SHOW-ERROR-LINE  ( n caddr u -- )
    CR SWAP OVER TYPE MARGIN - ABS >R
-   ?DUP IF R> .R ELSE R> 1- SPACES [CHAR] - EMIT THEN
+   DUP -1 = IF DROP R> 1- SPACES ." -" ELSE
+   R> .R THEN
 ;
 
 : SHOW-ERROR-COUNT  ( caddr u offset -- )
@@ -71,6 +72,7 @@ INIT-ERRORS
    HLINE
    S" Core" CORE-ERRORS SHOW-ERROR-COUNT
    S" Core extension" CORE-EXT-ERRORS SHOW-ERROR-COUNT
+   S" Block" BLOCK-ERRORS SHOW-ERROR-COUNT
    S" Double number" DOUBLE-ERRORS SHOW-ERROR-COUNT
    S" Exception" EXCEPTION-ERRORS SHOW-ERROR-COUNT
    S" Facility" FACILITY-ERRORS SHOW-ERROR-COUNT
@@ -80,7 +82,6 @@ INIT-ERRORS
    S" Programming-tools" TOOLS-ERRORS SHOW-ERROR-COUNT
    S" Search-order" SEARCHORDER-ERRORS SHOW-ERROR-COUNT
    S" String" STRING-ERRORS SHOW-ERROR-COUNT
-   S" Block" BLOCK-ERRORS SHOW-ERROR-COUNT
    HLINE
    TOTAL-ERRORS @ S" Total" SHOW-ERROR-LINE
    HLINE CR CR
