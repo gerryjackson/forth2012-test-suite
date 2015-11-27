@@ -11,11 +11,15 @@
 \ The tests are not claimed to be comprehensive or correct 
 
 \ ------------------------------------------------------------------------------
-\ Version 0.11 25 April Added tests for N>R NR> SYNONYM TRAVERSE-WORDLIST
+\ Version 0.13 31 October 2015 More tests on [ELSE] and [THEN]
+\              TRAVERSE-WORDLIST etc tests made conditional on the required
+\              search-order words being available
+\              Calls to COMPARE replaced with STR= (in utilities.fth)
+\         0.11 25 April Added tests for N>R NR> SYNONYM TRAVERSE-WORDLIST
 \              NAME>COMPILE NAME>INTERPRET NAME>STRING
 \         0.6  1 April 2012 Tests placed in the public domain.
 \              Further tests on [IF] [ELSE] [THEN]
-\         0.5  30 November 2009 <true> and <false> replaced with TRUE and FALSE
+\         0.5  30 November 2009 <TRUE> and <FALSE> replaced with TRUE and FALSE
 \         0.4  6 March 2009 ENDIF changed to THEN. {...} changed to T{...}T
 \         0.3  20 April 2007 ANS Forth words changed to upper case
 \         0.2  30 Oct 2006 updated following GForth test to avoid
@@ -35,10 +39,13 @@
 \     .S ? DUMP SEE WORDS
 \     ;CODE ASSEMBLER BYE CODE EDITOR FORGET STATE 
 \ ------------------------------------------------------------------------------
-\ Assumptions and dependencies:
-\     - tester.fr or ttester.fs has been loaded prior to this file
+\ Assumptions, dependencies and notes:
+\     - tester.fr (or ttester.fs), errorreport.fth and utilities.fth have been
+\       included prior to this file
+\     - the Core word set is available and tested
 \     - testing TRAVERSE-WORDLIST uses WORDLIST SEARCH-WORDLIST GET-CURRENT
-\       SET-CURRENT and FORTH-WORDLIST from the Search-order word set
+\       SET-CURRENT and FORTH-WORDLIST from the Search-order word set. If any
+\       of these are not present these tests will be ignored
 \ ------------------------------------------------------------------------------
 
 DECIMAL
@@ -88,16 +95,29 @@ TESTING [IF] and [ELSE] carry out a text scan by parsing and discarding words
 
 : PT10 REFILL DROP REFILL DROP ;
 
-T{ 0  [IF]            \ WORDS IGNORED UP TO [ELSE] 2
+T{ 0  [IF]            \ Words ignored up to [ELSE] 2
       [THEN] -> 2 }T
-T{ -1 [IF] 2 [ELSE] 3 S" [THEN] 4 PT10 IGNORED TO END OF LINE"
-      [THEN]          \ PRECAUTION IN CASE [THEN] IN STRING ISN'T RECOGNISED
+T{ -1 [IF] 2 [ELSE] 3 $" [THEN] 4 PT10 IGNORED TO END OF LINE"
+      [THEN]          \ A precaution in case [THEN] in string isn't recognised
    -> 2 4 }T
+
+\ -----------------------------------------------------------------------------
+TESTING [ELSE] and [THEN] without a preceding [IF]
+
+\ [ELSE] ... [THEN] acts like a multi-line comment
+T{ [ELSE]
+11 12 13
+[THEN] 14 -> 14 }T
+
+T{ [ELSE] -1 [IF] 15 [ELSE] 16 [THEN] 17 [THEN] 18 -> 18 }T
+
+\ A lone [THEN] is a noop
+T{ 19 [THEN] 20 -> 19 20 }T
 
 \ ------------------------------------------------------------------------------
 TESTING CS-PICK and CS-ROLL
 
-\ Test pt5 based on example in ANS document p 176.
+\ Test PT5 based on example in ANS document p 176.
 
 : ?REPEAT
    0 CS-PICK POSTPONE UNTIL
@@ -109,7 +129,7 @@ T{ : PT5  ( N1 -- )
       PT4 !
       BEGIN
          -1 PT4 +!
-         PT4 @ 4 > 0= ?REPEAT \ BACK TO BEGIN IF FALSE
+         PT4 @ 4 > 0= ?REPEAT \ Back TO BEGIN if FALSE
          111
          PT4 @ 3 > 0= ?REPEAT
          222
@@ -209,71 +229,81 @@ T{ NEW-SYN2 -> 2345 }T
 T{ : SYN3 SYN2 LITERAL ; SYN3 -> 2345 }T
 
 \ ------------------------------------------------------------------------------
-TESTING TRAVERSE-WORDLIST NAME>COMPILE NAME>INTERPRET NAME>STRING
+\ These tests require GET-CURRENT SET-CURRENT WORDLIST from the optional
+\ Search-Order word set. If any of these are not available the tests
+\ will be ignored
 
-GET-CURRENT CONSTANT CURR-WL
-WORDLIST CONSTANT TRAV-WL
-: WDCT ( n nt -- n+1 f ) DROP 1+ TRUE ;
-T{ 0 ' WDCT TRAV-WL TRAVERSE-WORDLIST -> 0 }T
+[?UNDEF] WORDLIST \? [?UNDEF] GET-CURRENT \? [?UNDEF] SET-CURRENT
+\? [?UNDEF] FORTH-WORDLIST
 
-TRAV-WL SET-CURRENT
-: TRAV1 1 ;
-T{ 0 ' WDCT TRAV-WL TRAVERSE-WORDLIST -> 1 }T
-: TRAV2 2 ; : TRAV3 3 ; : TRAV4 4 ; : TRAV5 5 ; : TRAV6 6 ; IMMEDIATE
-CURR-WL SET-CURRENT
-T{ 0 ' WDCT TRAV-WL TRAVERSE-WORDLIST -> 6 }T  \ Traverse whole wordlist
+\? TESTING TRAVERSE-WORDLIST NAME>COMPILE NAME>INTERPRET NAME>STRING
+
+\? GET-CURRENT CONSTANT CURR-WL
+\? WORDLIST CONSTANT TRAV-WL
+\? : WDCT ( n nt -- n+1 f ) DROP 1+ TRUE ;
+\? T{ 0 ' WDCT TRAV-WL TRAVERSE-WORDLIST -> 0 }T
+
+\? TRAV-WL SET-CURRENT
+\? : TRAV1 1 ;
+\? T{ 0 ' WDCT TRAV-WL TRAVERSE-WORDLIST -> 1 }T
+\? : TRAV2 2 ; : TRAV3 3 ; : TRAV4 4 ; : TRAV5 5 ; : TRAV6 6 ; IMMEDIATE
+\? CURR-WL SET-CURRENT
+\? T{ 0 ' WDCT TRAV-WL TRAVERSE-WORDLIST -> 6 }T  \ Traverse whole wordlist
 
 \ Terminate TRAVERSE-WORDLIST after n words & check it compiles
-: (PART-OF-WL)  ( ct n nt -- ct+1 n-1 )  DROP DUP IF SWAP 1+ SWAP 1- THEN DUP ;
-: PART-OF-WL  ( n -- ct 0 | ct+1 n-1)
-   0 SWAP ['] (PART-OF-WL) TRAV-WL TRAVERSE-WORDLIST DROP
-;
-T{ 0 PART-OF-WL -> 0 }T
-T{ 1 PART-OF-WL -> 1 }T
-T{ 4 PART-OF-WL -> 4 }T
-T{ 9 PART-OF-WL -> 6 }T  \ Traverse whole wordlist
+\? : (PART-OF-WL)  ( ct n nt -- ct+1 n-1 )
+\?    DROP DUP IF SWAP 1+ SWAP 1- THEN DUP
+\? ;
+\? : PART-OF-WL  ( n -- ct 0 | ct+1 n-1)
+\?    0 SWAP ['] (PART-OF-WL) TRAV-WL TRAVERSE-WORDLIST DROP
+\? ;
+\? T{ 0 PART-OF-WL -> 0 }T
+\? T{ 1 PART-OF-WL -> 1 }T
+\? T{ 4 PART-OF-WL -> 4 }T
+\? T{ 9 PART-OF-WL -> 6 }T  \ Traverse whole wordlist
 
 \ Testing NAME>.. words require a name token. It will be easier to test them
 \ if there is a way of obtaining the name token of a given word. To get this we
 \ need a definition to compare a given name with the result of NAME>STRING.
 \ The output from NAME>STRING has to be copied into a buffer and converted to a
-\ known case as a given Forth system may store names as lower, upper or mixed case.
+\ known case as different Forth systems may store names as lower, upper or
+\ mixed case.
 
-CREATE UCBUF 32 CHARS ALLOT    \ The buffer
+\? CREATE UCBUF 32 CHARS ALLOT    \ The buffer
 
 \ Convert string to upper case and save in the buffer.
 
-: >UPPERCASE  ( caddr u  -- caddr2 u2 )
-   32 MIN DUP >R UCBUF ROT ROT
-   OVER + SWAP
-   DO
-      I C@ DUP [CHAR] a [CHAR] z 1+ WITHIN IF 32 INVERT AND THEN
-      OVER C! CHAR+
-   LOOP DROP
-   UCBUF R>
-;
+\? : >UPPERCASE  ( caddr u  -- caddr2 u2 )
+\?    32 MIN DUP >R UCBUF ROT ROT
+\?    OVER + SWAP
+\?    DO
+\?       I C@ DUP [CHAR] a [CHAR] z 1+ WITHIN IF 32 INVERT AND THEN
+\?       OVER C! CHAR+
+\?    LOOP DROP
+\?    UCBUF R>
+\? ;
 
-\ Compare string (caddr u) with name associated with nt, f=0 if the same
-: NAME?  ( caddr u nt -- caddr u f )   \ f = true for name = (caddr u) string
-   NAME>STRING >UPPERCASE 2OVER COMPARE 0=
-;
+\ Compare string (caddr u) with name associated with nt
+\? : NAME?  ( caddr u nt -- caddr u f )   \ f = true for name = (caddr u) string
+\?    NAME>STRING >UPPERCASE 2OVER STR=
+\? ;
 
 \ The word to be executed by TRAVERSE-WORDLIST
-: GET-NT  ( caddr u 0 nt -- caddr u nt false | caddr u 0 nt ) \ nt <> 0
-   2>R R@ NAME? IF R> R> ELSE 2R> THEN
-;
+\? : GET-NT  ( caddr u 0 nt -- caddr u nt false | caddr u 0 nt ) \ nt <> 0
+\?    2>R R@ NAME? IF R> R> ELSE 2R> THEN
+\? ;
 
 \ Get name token of (caddr u) in wordlist wid, return 0 if not present
-: GET-NAME-TOKEN  ( caddr u wid -- nt | 0 )
-   0 ['] GET-NT ROT TRAVERSE-WORDLIST >R 2DROP R>
-;
+\? : GET-NAME-TOKEN  ( caddr u wid -- nt | 0 )
+\?    0 ['] GET-NT ROT TRAVERSE-WORDLIST >R 2DROP R>
+\? ;
 
 \ Test NAME>STRING via TRAVERSE-WORDLIST
-T{ S" ABCDE" TRAV-WL GET-NAME-TOKEN 0= -> TRUE  }T \ Not in wordlist
-T{ S" TRAV4" TRAV-WL GET-NAME-TOKEN 0= -> FALSE }T
+\? T{ $" ABCDE" TRAV-WL GET-NAME-TOKEN 0= -> TRUE  }T \ Not in wordlist
+\? T{ $" TRAV4" TRAV-WL GET-NAME-TOKEN 0= -> FALSE }T
 
 \ Test NAME>INTERPRET on a word with interpretation semantics
-T{ S" TRAV3" TRAV-WL GET-NAME-TOKEN NAME>INTERPRET EXECUTE -> 3 }T
+\? T{ $" TRAV3" TRAV-WL GET-NAME-TOKEN NAME>INTERPRET EXECUTE -> 3 }T
 
 \ Test NAME>INTERPRET on a word without interpretation semantics. It is
 \ difficult to choose a suitable word because:
@@ -286,29 +316,33 @@ T{ S" TRAV3" TRAV-WL GET-NAME-TOKEN NAME>INTERPRET EXECUTE -> 3 }T
 \ doesn't work in a given system choose another word for that system.
 \ FORTH-WORDLIST is needed
 
-T{ S" [']" FORTH-WORDLIST GET-NAME-TOKEN NAME>INTERPRET -> 0 }T
+\? T{ $" [']" FORTH-WORDLIST GET-NAME-TOKEN NAME>INTERPRET -> 0 }T
 
 \ Test NAME>COMPILE
-: N>C  ( caddr u -- )  TRAV-WL GET-NAME-TOKEN NAME>COMPILE EXECUTE ; IMMEDIATE
-T{ : N>C1  ( -- n )  [ S" TRAV2" ] N>C ; N>C1 -> 2 }T          \ Not immediate
-T{ : N>C2  ( -- n )  [ S" TRAV6" ] N>C LITERAL ; N>C2 -> 6 }T  \ Immediate word
-T{ S" TRAV6" TRAV-WL GET-NAME-TOKEN NAME>COMPILE EXECUTE -> 6 }T
+\? : N>C  ( caddr u -- )  TRAV-WL GET-NAME-TOKEN NAME>COMPILE EXECUTE ; IMMEDIATE
+\? T{ : N>C1  ( -- n )  [ $" TRAV2" ] N>C ; N>C1 -> 2 }T          \ Not immediate
+\? T{ : N>C2  ( -- n )  [ $" TRAV6" ] N>C LITERAL ; N>C2 -> 6 }T  \ Immediate word
+\? T{ $" TRAV6" TRAV-WL GET-NAME-TOKEN NAME>COMPILE EXECUTE -> 6 }T
 
 \ Test the order of finding words with the same name
-TRAV-WL SET-CURRENT
-: TRAV3 33 ; : TRAV3 333 ; : TRAV7 7 ; : TRAV3 3333 ;
-CURR-WL SET-CURRENT
+\? TRAV-WL SET-CURRENT
+\? : TRAV3 33 ; : TRAV3 333 ; : TRAV7 7 ; : TRAV3 3333 ;
+\? CURR-WL SET-CURRENT
 
-: GET-ALL  ( caddr u nt -- [n] caddr u true )
-   DUP >R NAME? IF R@ NAME>INTERPRET EXECUTE ROT ROT THEN
-   R> DROP TRUE
-; 
+\? : GET-ALL  ( caddr u nt -- [n] caddr u true )
+\?    DUP >R NAME? IF R@ NAME>INTERPRET EXECUTE ROT ROT THEN
+\?    R> DROP TRUE
+\? ; 
 
-: GET-ALL  ( caddr u -- i*x )
-   ['] GET-ALL TRAV-WL TRAVERSE-WORDLIST 2DROP
-;
+\? : GET-ALL  ( caddr u -- i*x )
+\?    ['] GET-ALL TRAV-WL TRAVERSE-WORDLIST 2DROP
+\? ;
 
-T{ S" TRAV3" GET-ALL -> 3333 333 33 3 }T
+\? T{ $" TRAV3" GET-ALL -> 3333 333 33 3 }T
+[?ELSE]
+\? CR CR
+\? .( Some search-order words not present - TRAVERSE-WORDLIST etc not tested) CR
+[?THEN]
 
 \ ------------------------------------------------------------------------------
 

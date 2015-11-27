@@ -11,7 +11,8 @@
 \ The tests are not claimed to be comprehensive or correct 
 
 \ ------------------------------------------------------------------------------
-\ Version 0.12 22 July 2015, >IN Manipulation test modified to work on 16 bit
+\ Version 0.13 TRUE changed to <TRUE> as defined in core.fr
+\         0.12 22 July 2015, >IN Manipulation test modified to work on 16 bit
 \              Forth systems
 \         0.11 25 April 2015 Number prefixes # $ % and 'c' character input tested
 \         0.10 3 August 2014 Test IMMEDIATE doesn't toggle an immediate flag
@@ -37,7 +38,7 @@
 \ ------------------------------------------------------------------------------
 \ Assumptions and dependencies:
 \     - tester.fr or ttester.fs has been loaded prior to this file
-\     - core.fr has been loaded so that constants MAX-INT, MIN-INT and
+\     - core.fr has been loaded so that constants <TRUE> MAX-INT, MIN-INT and
 \       MAX-UINT are defined
 \ ------------------------------------------------------------------------------
 
@@ -216,7 +217,7 @@ T{ %-10010110 -> -150 }T
 T{ %-10010110. -> -150. }T
 T{ 'z' -> 122 }T
 \ Check BASE is unchanged
-T{ BASE @ OLD-BASE @ = -> TRUE }T
+T{ BASE @ OLD-BASE @ = -> <TRUE> }T
 
 \ Repeat in Hex mode
 16 OLD-BASE ! 16 BASE !
@@ -234,7 +235,7 @@ T{ %-10010110 -> -96 }T
 T{ %-10010110. -> -96. }T
 T{ 'z' -> 7a }T
 \ Check BASE is unchanged
-T{ BASE @ OLD-BASE @ = -> TRUE }T   \ 2
+T{ BASE @ OLD-BASE @ = -> <TRUE> }T   \ 2
 
 DECIMAL
 \ Check number prefixes in compile mode

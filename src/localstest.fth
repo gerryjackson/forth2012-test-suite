@@ -11,7 +11,9 @@
 \ The tests are not claimed to be comprehensive or correct 
 
 \ ------------------------------------------------------------------------------
-\ Version 0.11 25 April 2015 Initial release
+\ Version 0.13 13 Nov 2015 Priority of locals tests made conditional on the
+\              the required search-order words being available
+\         0.11 25 April 2015 Initial release
 
 \ ------------------------------------------------------------------------------
 \ The tests are based on John Hayes test program for the core word set
@@ -24,11 +26,12 @@
 \     LOCALS|  (designated obsolescent in Forth 2012)
 \ ------------------------------------------------------------------------------
 \ Assumptions, dependencies and notes:
-\     - tester.fr or ttester.fs has been loaded prior to this file
+\     - tester.fr (or ttester.fs), errorreport.fth and utilities.fth have been
+\       included prior to this file
+\     - the Core word set is available and tested
 \     - some tests at the end require the following words from the Search-Order
 \       word set WORDLIST GET-CURRENT SET-CURRENT GET-ORDER SET-ORDER PREVIOUS.
-\       If these are not available either comment out or delete the tests.
-\     - TRUE is present from the Core extension word set 
+\       If any these are not available the tests will be ignored.
 \ ------------------------------------------------------------------------------
 
 TESTING Locals word set
@@ -117,26 +120,40 @@ T{ : LOCAL BL WORD COUNT (LOCAL) ; IMMEDIATE -> }T
 T{ : END-LOCALS 99 0 (LOCAL) ; IMMEDIATE     -> }T
 : LT32 LOCAL A LOCAL B LOCAL C END-LOCALS A B C ; 61 62 63 LT32 -> 63 62 61 }T
 
-TESTING that local names are always found first & that they are not available
-\ at the end of a definition.
-\ These test require Search-order words WORDLIST GET-CURRENT SET-CURRENT
-\ GET-ORDER SET-ORDER PREVIOUS. If these are not available either comment out
-\ or delete the tests.
+\ ------------------------------------------------------------------------------
+\ These tests require Search-order words WORDLIST GET-CURRENT SET-CURRENT
+\ GET-ORDER SET-ORDER PREVIOUS. If any of these are not available the following
+\ tests will be ignored except for the simple test
+[?UNDEF] WORDLIST \? [?UNDEF] GET-CURRENT \? [?UNDEF] SET-CURRENT
+\? [?UNDEF] GET-ORDER \? [?UNDEF] SET-ORDER
 
-WORDLIST CONSTANT LTWL1
-WORDLIST CONSTANT LTWL2
-GET-CURRENT LTWL1 SET-CURRENT
-: LT33 64 ;       \ Define LT33 in LTWL1 wordlist
-LTWL2 SET-CURRENT
-: LT33 65 ;       \ Redefine LT33 in LTWL2 wordlist
-SET-CURRENT
-: ALSO-LTWL  ( wid -- )  >R GET-ORDER R> SWAP 1+ SET-ORDER ;
-LTWL1 ALSO-LTWL   \ Add LTWL1 to search-order
-T{ : LT34 {: LT33 :} LT33 ; 66 LT34 LT33 -> 66 64 }T
-T{ : LT35 {: LT33 :} LT33 LTWL2 ALSO-LTWL LT33 PREVIOUS LT33 PREVIOUS LT33 ; -> }T
+\? TESTING that local names are always found first & that they are not available
+\ after the end of a definition.
+
+\ Simple test
+: LT36 68 ;
+T{ : LT37 {: LT36 :} LT36 ; 69 LT37 LT36 -> 69 68 }T 
+
+\? WORDLIST CONSTANT LTWL1
+\? WORDLIST CONSTANT LTWL2
+\? GET-CURRENT LTWL1 SET-CURRENT
+\? : LT33 64 ;       \ Define LT33 in LTWL1 wordlist
+\? LTWL2 SET-CURRENT
+\? : LT33 65 ;       \ Redefine LT33 in LTWL2 wordlist
+\? SET-CURRENT
+\? : ALSO-LTWL  ( wid -- )  >R GET-ORDER R> SWAP 1+ SET-ORDER ;
+\? LTWL1 ALSO-LTWL   \ Add LTWL1 to search-order
+\? T{ : LT34 {: LT33 :} LT33 ; 66 LT34 LT33 -> 66 64 }T
+\? T{ : LT35 {: LT33 :} LT33 LTWL2 ALSO-LTWL LT33 PREVIOUS LT33 PREVIOUS LT33 ;
+\?    -> }T
 \ If the next test fails the system may be left with LTWL2 and/or LTWL1 in the
 \ search order
-T{ 67 LT35 -> 67 67 67 67 }T
+\? T{ 67 LT35 -> 67 67 67 67 }T
+[?ELSE]
+\? CR CR
+\? .( Some search-order words not present - priority of Locals not fully tested)
+\? CR
+[?THEN]
 
 \ ------------------------------------------------------------------------------
 

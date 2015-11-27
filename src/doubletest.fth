@@ -10,12 +10,13 @@
 
 \ The tests are not claimed to be comprehensive or correct 
 \ ------------------------------------------------------------------------------
-\ Version 0.12  1 August 2015 test D< acts on MS cells of double word
+\ Version 0.13  Assumptions and dependencies changed
+\         0.12  1 August 2015 test D< acts on MS cells of double word
 \         0.11  7 April 2015 2VALUE tested
 \         0.6   1 April 2012 Tests placed in the public domain.
 \               Immediate 2CONSTANTs and 2VARIABLEs tested
 \         0.5   20 November 2009 Various constants renamed to avoid
-\               redefinition warnings. <true> and <false> replaced
+\               redefinition warnings. <TRUE> and <FALSE> replaced
 \               with TRUE and FALSE
 \         0.4   6 March 2009 { and } replaced with T{ and }T
 \               Tests rewritten to be independent of word size and
@@ -33,8 +34,9 @@
 \ Also tests the interpreter and compiler reading a double number
 \ ------------------------------------------------------------------------------
 \ Assumptions and dependencies:
-\     - tester.fr or ttester.fs has been included prior to this file
-\     - core words and core extension words have been tested
+\     - tester.fr (or ttester.fs), errorreport.fth and utilities.fth have been
+\       included prior to this file
+\     - the Core word set is available and tested
 \ ------------------------------------------------------------------------------
 \ Constant definitions
 

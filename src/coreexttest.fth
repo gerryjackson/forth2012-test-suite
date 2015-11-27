@@ -12,15 +12,18 @@
 
 \ ------------------------------------------------------------------------------
 \ Version 0.13 28 October 2015
+\              Replace <FALSE> and <TRUE> with FALSE and TRUE to avoid
+\              dependence on Core tests
+\              Moved SAVE-INPUT and RESTORE-INPUT tests in a file to filetest.fth
 \              Use of 2VARIABLE (from optional wordset) replaced with CREATE.
 \              Minor lower to upper case conversions.
-\              Calls to COMPARE replaced by new definition STR= to avoid use of
-\              a word from an optional word set.
+\              Calls to COMPARE replaced by STR= (in utilities.fth) to avoid use
+\              of a word from an optional word set.
 \              UNUSED tests revised as UNUSED UNUSED = may return FALSE when an
 \              implementation has the data stack sharing unused dataspace.
 \              Double number input dependency removed from the HOLDS tests.
 \              Minor case sensitivities removed in definition names.
-\              0.11 25 April 2015
+\         0.11 25 April 2015
 \              Added tests for PARSE-NAME HOLDS BUFFER:
 \              S\" tests added
 \              DEFER IS ACTION-OF DEFER! DEFER@ tests added
@@ -68,15 +71,16 @@
 \     when testing from a file such as this one
 \     UNUSED (partially tested) as the value returned is system dependent
 \     Obsolescent words #TIB CONVERT EXPECT QUERY SPAN TIB as they have been
-\     removed from the Forth 200X standard
+\     removed from the Forth 2012 standard
 
 \ Results from words that output to the user output device have to visually
 \ checked for correctness. These are .R U.R .(
 
 \ -----------------------------------------------------------------------------
-\ Assumptions:
-\     - tester.fr (or ttester.fs) and core-fr have been included prior to this
-\       file
+\ Assumptions & dependencies:
+\     - tester.fr (or ttester.fs), errorreport.fth and utilities.fth have been
+\       included prior to this file
+\     - the Core word set available
 \ -----------------------------------------------------------------------------
 TESTING Core Extension words
 
@@ -88,68 +92,45 @@ T{ TRUE  -> 0 INVERT }T
 T{ FALSE -> 0 }T
 
 \ -----------------------------------------------------------------------------
-\ STR=  to compare (case depenedent) 2 strings to avoid use of COMPARE from
-\ the String word set
-
-: STR=  ( caddr1 u1 caddr2 u2 -- f )   \ f = TRUE if strings are equal
-   ROT OVER <> IF DROP 2DROP FALSE EXIT THEN
-   0 ?DO
-         OVER C@ OVER C@ <> IF 2DROP FALSE UNLOOP EXIT THEN
-         CHAR+ SWAP CHAR+
-     LOOP 2DROP TRUE
-;
-
-: STR1  S" abcd" ;  : STR2 S" abcde" ;
-: STR3  S" abCd" ;  : STR4  S" wbcd"  ;
-: S"" S" " ;
-
-T{ STR1 2DUP STR= -> TRUE }T
-T{ STR2 2DUP STR= -> TRUE }T
-T{ S""  2DUP STR= -> TRUE }T
-T{ STR1 STR2 STR= -> FALSE }T
-T{ STR1 STR3 STR= -> FALSE }T
-T{ STR1 STR4 STR= -> FALSE }T
-
-\ -----------------------------------------------------------------------------
 TESTING <> U>   (contributed by James Bowman)
 
-T{ 0 0 <> -> <FALSE> }T
-T{ 1 1 <> -> <FALSE> }T
-T{ -1 -1 <> -> <FALSE> }T
-T{ 1 0 <> -> <TRUE> }T
-T{ -1 0 <> -> <TRUE> }T
-T{ 0 1 <> -> <TRUE> }T
-T{ 0 -1 <> -> <TRUE> }T
+T{ 0 0 <> -> FALSE }T
+T{ 1 1 <> -> FALSE }T
+T{ -1 -1 <> -> FALSE }T
+T{ 1 0 <> -> TRUE }T
+T{ -1 0 <> -> TRUE }T
+T{ 0 1 <> -> TRUE }T
+T{ 0 -1 <> -> TRUE }T
 
-T{ 0 1 U> -> <FALSE> }T
-T{ 1 2 U> -> <FALSE> }T
-T{ 0 MID-UINT U> -> <FALSE> }T
-T{ 0 MAX-UINT U> -> <FALSE> }T
-T{ MID-UINT MAX-UINT U> -> <FALSE> }T
-T{ 0 0 U> -> <FALSE> }T
-T{ 1 1 U> -> <FALSE> }T
-T{ 1 0 U> -> <TRUE> }T
-T{ 2 1 U> -> <TRUE> }T
-T{ MID-UINT 0 U> -> <TRUE> }T
-T{ MAX-UINT 0 U> -> <TRUE> }T
-T{ MAX-UINT MID-UINT U> -> <TRUE> }T
+T{ 0 1 U> -> FALSE }T
+T{ 1 2 U> -> FALSE }T
+T{ 0 MID-UINT U> -> FALSE }T
+T{ 0 MAX-UINT U> -> FALSE }T
+T{ MID-UINT MAX-UINT U> -> FALSE }T
+T{ 0 0 U> -> FALSE }T
+T{ 1 1 U> -> FALSE }T
+T{ 1 0 U> -> TRUE }T
+T{ 2 1 U> -> TRUE }T
+T{ MID-UINT 0 U> -> TRUE }T
+T{ MAX-UINT 0 U> -> TRUE }T
+T{ MAX-UINT MID-UINT U> -> TRUE }T
 
 \ -----------------------------------------------------------------------------
 TESTING 0<> 0>   (contributed by James Bowman)
 
-T{ 0 0<> -> <FALSE> }T
-T{ 1 0<> -> <TRUE> }T
-T{ 2 0<> -> <TRUE> }T
-T{ -1 0<> -> <TRUE> }T
-T{ MAX-UINT 0<> -> <TRUE> }T
-T{ MIN-INT 0<> -> <TRUE> }T
-T{ MAX-INT 0<> -> <TRUE> }T
+T{ 0 0<> -> FALSE }T
+T{ 1 0<> -> TRUE }T
+T{ 2 0<> -> TRUE }T
+T{ -1 0<> -> TRUE }T
+T{ MAX-UINT 0<> -> TRUE }T
+T{ MIN-INT 0<> -> TRUE }T
+T{ MAX-INT 0<> -> TRUE }T
 
-T{ 0 0> -> <FALSE> }T
-T{ -1 0> -> <FALSE> }T
-T{ MIN-INT 0> -> <FALSE> }T
-T{ 1 0> -> <TRUE> }T
-T{ MAX-INT 0> -> <TRUE> }T
+T{ 0 0> -> FALSE }T
+T{ -1 0> -> FALSE }T
+T{ MIN-INT 0> -> FALSE }T
+T{ 1 0> -> TRUE }T
+T{ MAX-INT 0> -> TRUE }T
 
 \ -----------------------------------------------------------------------------
 TESTING NIP TUCK ROLL PICK   (contributed by James Bowman)
@@ -193,135 +174,135 @@ T{ BASE @ HEX BASE @ DECIMAL BASE @ - SWAP BASE ! -> 6 }T
 \ -----------------------------------------------------------------------------
 TESTING WITHIN   (contributed by James Bowman)
 
-T{ 0 0 0 WITHIN -> <FALSE> }T
-T{ 0 0 MID-UINT WITHIN -> <TRUE> }T
-T{ 0 0 MID-UINT+1 WITHIN -> <TRUE> }T
-T{ 0 0 MAX-UINT WITHIN -> <TRUE> }T
-T{ 0 MID-UINT 0 WITHIN -> <FALSE> }T
-T{ 0 MID-UINT MID-UINT WITHIN -> <FALSE> }T
-T{ 0 MID-UINT MID-UINT+1 WITHIN -> <FALSE> }T
-T{ 0 MID-UINT MAX-UINT WITHIN -> <FALSE> }T
-T{ 0 MID-UINT+1 0 WITHIN -> <FALSE> }T
-T{ 0 MID-UINT+1 MID-UINT WITHIN -> <TRUE> }T
-T{ 0 MID-UINT+1 MID-UINT+1 WITHIN -> <FALSE> }T
-T{ 0 MID-UINT+1 MAX-UINT WITHIN -> <FALSE> }T
-T{ 0 MAX-UINT 0 WITHIN -> <FALSE> }T
-T{ 0 MAX-UINT MID-UINT WITHIN -> <TRUE> }T
-T{ 0 MAX-UINT MID-UINT+1 WITHIN -> <TRUE> }T
-T{ 0 MAX-UINT MAX-UINT WITHIN -> <FALSE> }T
-T{ MID-UINT 0 0 WITHIN -> <FALSE> }T
-T{ MID-UINT 0 MID-UINT WITHIN -> <FALSE> }T
-T{ MID-UINT 0 MID-UINT+1 WITHIN -> <TRUE> }T
-T{ MID-UINT 0 MAX-UINT WITHIN -> <TRUE> }T
-T{ MID-UINT MID-UINT 0 WITHIN -> <TRUE> }T
-T{ MID-UINT MID-UINT MID-UINT WITHIN -> <FALSE> }T
-T{ MID-UINT MID-UINT MID-UINT+1 WITHIN -> <TRUE> }T
-T{ MID-UINT MID-UINT MAX-UINT WITHIN -> <TRUE> }T
-T{ MID-UINT MID-UINT+1 0 WITHIN -> <FALSE> }T
-T{ MID-UINT MID-UINT+1 MID-UINT WITHIN -> <FALSE> }T
-T{ MID-UINT MID-UINT+1 MID-UINT+1 WITHIN -> <FALSE> }T
-T{ MID-UINT MID-UINT+1 MAX-UINT WITHIN -> <FALSE> }T
-T{ MID-UINT MAX-UINT 0 WITHIN -> <FALSE> }T
-T{ MID-UINT MAX-UINT MID-UINT WITHIN -> <FALSE> }T
-T{ MID-UINT MAX-UINT MID-UINT+1 WITHIN -> <TRUE> }T
-T{ MID-UINT MAX-UINT MAX-UINT WITHIN -> <FALSE> }T
-T{ MID-UINT+1 0 0 WITHIN -> <FALSE> }T
-T{ MID-UINT+1 0 MID-UINT WITHIN -> <FALSE> }T
-T{ MID-UINT+1 0 MID-UINT+1 WITHIN -> <FALSE> }T
-T{ MID-UINT+1 0 MAX-UINT WITHIN -> <TRUE> }T
-T{ MID-UINT+1 MID-UINT 0 WITHIN -> <TRUE> }T
-T{ MID-UINT+1 MID-UINT MID-UINT WITHIN -> <FALSE> }T
-T{ MID-UINT+1 MID-UINT MID-UINT+1 WITHIN -> <FALSE> }T
-T{ MID-UINT+1 MID-UINT MAX-UINT WITHIN -> <TRUE> }T
-T{ MID-UINT+1 MID-UINT+1 0 WITHIN -> <TRUE> }T
-T{ MID-UINT+1 MID-UINT+1 MID-UINT WITHIN -> <TRUE> }T
-T{ MID-UINT+1 MID-UINT+1 MID-UINT+1 WITHIN -> <FALSE> }T
-T{ MID-UINT+1 MID-UINT+1 MAX-UINT WITHIN -> <TRUE> }T
-T{ MID-UINT+1 MAX-UINT 0 WITHIN -> <FALSE> }T
-T{ MID-UINT+1 MAX-UINT MID-UINT WITHIN -> <FALSE> }T
-T{ MID-UINT+1 MAX-UINT MID-UINT+1 WITHIN -> <FALSE> }T
-T{ MID-UINT+1 MAX-UINT MAX-UINT WITHIN -> <FALSE> }T
-T{ MAX-UINT 0 0 WITHIN -> <FALSE> }T
-T{ MAX-UINT 0 MID-UINT WITHIN -> <FALSE> }T
-T{ MAX-UINT 0 MID-UINT+1 WITHIN -> <FALSE> }T
-T{ MAX-UINT 0 MAX-UINT WITHIN -> <FALSE> }T
-T{ MAX-UINT MID-UINT 0 WITHIN -> <TRUE> }T
-T{ MAX-UINT MID-UINT MID-UINT WITHIN -> <FALSE> }T
-T{ MAX-UINT MID-UINT MID-UINT+1 WITHIN -> <FALSE> }T
-T{ MAX-UINT MID-UINT MAX-UINT WITHIN -> <FALSE> }T
-T{ MAX-UINT MID-UINT+1 0 WITHIN -> <TRUE> }T
-T{ MAX-UINT MID-UINT+1 MID-UINT WITHIN -> <TRUE> }T
-T{ MAX-UINT MID-UINT+1 MID-UINT+1 WITHIN -> <FALSE> }T
-T{ MAX-UINT MID-UINT+1 MAX-UINT WITHIN -> <FALSE> }T
-T{ MAX-UINT MAX-UINT 0 WITHIN -> <TRUE> }T
-T{ MAX-UINT MAX-UINT MID-UINT WITHIN -> <TRUE> }T
-T{ MAX-UINT MAX-UINT MID-UINT+1 WITHIN -> <TRUE> }T
-T{ MAX-UINT MAX-UINT MAX-UINT WITHIN -> <FALSE> }T
+T{ 0 0 0 WITHIN -> FALSE }T
+T{ 0 0 MID-UINT WITHIN -> TRUE }T
+T{ 0 0 MID-UINT+1 WITHIN -> TRUE }T
+T{ 0 0 MAX-UINT WITHIN -> TRUE }T
+T{ 0 MID-UINT 0 WITHIN -> FALSE }T
+T{ 0 MID-UINT MID-UINT WITHIN -> FALSE }T
+T{ 0 MID-UINT MID-UINT+1 WITHIN -> FALSE }T
+T{ 0 MID-UINT MAX-UINT WITHIN -> FALSE }T
+T{ 0 MID-UINT+1 0 WITHIN -> FALSE }T
+T{ 0 MID-UINT+1 MID-UINT WITHIN -> TRUE }T
+T{ 0 MID-UINT+1 MID-UINT+1 WITHIN -> FALSE }T
+T{ 0 MID-UINT+1 MAX-UINT WITHIN -> FALSE }T
+T{ 0 MAX-UINT 0 WITHIN -> FALSE }T
+T{ 0 MAX-UINT MID-UINT WITHIN -> TRUE }T
+T{ 0 MAX-UINT MID-UINT+1 WITHIN -> TRUE }T
+T{ 0 MAX-UINT MAX-UINT WITHIN -> FALSE }T
+T{ MID-UINT 0 0 WITHIN -> FALSE }T
+T{ MID-UINT 0 MID-UINT WITHIN -> FALSE }T
+T{ MID-UINT 0 MID-UINT+1 WITHIN -> TRUE }T
+T{ MID-UINT 0 MAX-UINT WITHIN -> TRUE }T
+T{ MID-UINT MID-UINT 0 WITHIN -> TRUE }T
+T{ MID-UINT MID-UINT MID-UINT WITHIN -> FALSE }T
+T{ MID-UINT MID-UINT MID-UINT+1 WITHIN -> TRUE }T
+T{ MID-UINT MID-UINT MAX-UINT WITHIN -> TRUE }T
+T{ MID-UINT MID-UINT+1 0 WITHIN -> FALSE }T
+T{ MID-UINT MID-UINT+1 MID-UINT WITHIN -> FALSE }T
+T{ MID-UINT MID-UINT+1 MID-UINT+1 WITHIN -> FALSE }T
+T{ MID-UINT MID-UINT+1 MAX-UINT WITHIN -> FALSE }T
+T{ MID-UINT MAX-UINT 0 WITHIN -> FALSE }T
+T{ MID-UINT MAX-UINT MID-UINT WITHIN -> FALSE }T
+T{ MID-UINT MAX-UINT MID-UINT+1 WITHIN -> TRUE }T
+T{ MID-UINT MAX-UINT MAX-UINT WITHIN -> FALSE }T
+T{ MID-UINT+1 0 0 WITHIN -> FALSE }T
+T{ MID-UINT+1 0 MID-UINT WITHIN -> FALSE }T
+T{ MID-UINT+1 0 MID-UINT+1 WITHIN -> FALSE }T
+T{ MID-UINT+1 0 MAX-UINT WITHIN -> TRUE }T
+T{ MID-UINT+1 MID-UINT 0 WITHIN -> TRUE }T
+T{ MID-UINT+1 MID-UINT MID-UINT WITHIN -> FALSE }T
+T{ MID-UINT+1 MID-UINT MID-UINT+1 WITHIN -> FALSE }T
+T{ MID-UINT+1 MID-UINT MAX-UINT WITHIN -> TRUE }T
+T{ MID-UINT+1 MID-UINT+1 0 WITHIN -> TRUE }T
+T{ MID-UINT+1 MID-UINT+1 MID-UINT WITHIN -> TRUE }T
+T{ MID-UINT+1 MID-UINT+1 MID-UINT+1 WITHIN -> FALSE }T
+T{ MID-UINT+1 MID-UINT+1 MAX-UINT WITHIN -> TRUE }T
+T{ MID-UINT+1 MAX-UINT 0 WITHIN -> FALSE }T
+T{ MID-UINT+1 MAX-UINT MID-UINT WITHIN -> FALSE }T
+T{ MID-UINT+1 MAX-UINT MID-UINT+1 WITHIN -> FALSE }T
+T{ MID-UINT+1 MAX-UINT MAX-UINT WITHIN -> FALSE }T
+T{ MAX-UINT 0 0 WITHIN -> FALSE }T
+T{ MAX-UINT 0 MID-UINT WITHIN -> FALSE }T
+T{ MAX-UINT 0 MID-UINT+1 WITHIN -> FALSE }T
+T{ MAX-UINT 0 MAX-UINT WITHIN -> FALSE }T
+T{ MAX-UINT MID-UINT 0 WITHIN -> TRUE }T
+T{ MAX-UINT MID-UINT MID-UINT WITHIN -> FALSE }T
+T{ MAX-UINT MID-UINT MID-UINT+1 WITHIN -> FALSE }T
+T{ MAX-UINT MID-UINT MAX-UINT WITHIN -> FALSE }T
+T{ MAX-UINT MID-UINT+1 0 WITHIN -> TRUE }T
+T{ MAX-UINT MID-UINT+1 MID-UINT WITHIN -> TRUE }T
+T{ MAX-UINT MID-UINT+1 MID-UINT+1 WITHIN -> FALSE }T
+T{ MAX-UINT MID-UINT+1 MAX-UINT WITHIN -> FALSE }T
+T{ MAX-UINT MAX-UINT 0 WITHIN -> TRUE }T
+T{ MAX-UINT MAX-UINT MID-UINT WITHIN -> TRUE }T
+T{ MAX-UINT MAX-UINT MID-UINT+1 WITHIN -> TRUE }T
+T{ MAX-UINT MAX-UINT MAX-UINT WITHIN -> FALSE }T
 
-T{ MIN-INT MIN-INT MIN-INT WITHIN -> <FALSE> }T
-T{ MIN-INT MIN-INT 0 WITHIN -> <TRUE> }T
-T{ MIN-INT MIN-INT 1 WITHIN -> <TRUE> }T
-T{ MIN-INT MIN-INT MAX-INT WITHIN -> <TRUE> }T
-T{ MIN-INT 0 MIN-INT WITHIN -> <FALSE> }T
-T{ MIN-INT 0 0 WITHIN -> <FALSE> }T
-T{ MIN-INT 0 1 WITHIN -> <FALSE> }T
-T{ MIN-INT 0 MAX-INT WITHIN -> <FALSE> }T
-T{ MIN-INT 1 MIN-INT WITHIN -> <FALSE> }T
-T{ MIN-INT 1 0 WITHIN -> <TRUE> }T
-T{ MIN-INT 1 1 WITHIN -> <FALSE> }T
-T{ MIN-INT 1 MAX-INT WITHIN -> <FALSE> }T
-T{ MIN-INT MAX-INT MIN-INT WITHIN -> <FALSE> }T
-T{ MIN-INT MAX-INT 0 WITHIN -> <TRUE> }T
-T{ MIN-INT MAX-INT 1 WITHIN -> <TRUE> }T
-T{ MIN-INT MAX-INT MAX-INT WITHIN -> <FALSE> }T
-T{ 0 MIN-INT MIN-INT WITHIN -> <FALSE> }T
-T{ 0 MIN-INT 0 WITHIN -> <FALSE> }T
-T{ 0 MIN-INT 1 WITHIN -> <TRUE> }T
-T{ 0 MIN-INT MAX-INT WITHIN -> <TRUE> }T
-T{ 0 0 MIN-INT WITHIN -> <TRUE> }T
-T{ 0 0 0 WITHIN -> <FALSE> }T
-T{ 0 0 1 WITHIN -> <TRUE> }T
-T{ 0 0 MAX-INT WITHIN -> <TRUE> }T
-T{ 0 1 MIN-INT WITHIN -> <FALSE> }T
-T{ 0 1 0 WITHIN -> <FALSE> }T
-T{ 0 1 1 WITHIN -> <FALSE> }T
-T{ 0 1 MAX-INT WITHIN -> <FALSE> }T
-T{ 0 MAX-INT MIN-INT WITHIN -> <FALSE> }T
-T{ 0 MAX-INT 0 WITHIN -> <FALSE> }T
-T{ 0 MAX-INT 1 WITHIN -> <TRUE> }T
-T{ 0 MAX-INT MAX-INT WITHIN -> <FALSE> }T
-T{ 1 MIN-INT MIN-INT WITHIN -> <FALSE> }T
-T{ 1 MIN-INT 0 WITHIN -> <FALSE> }T
-T{ 1 MIN-INT 1 WITHIN -> <FALSE> }T
-T{ 1 MIN-INT MAX-INT WITHIN -> <TRUE> }T
-T{ 1 0 MIN-INT WITHIN -> <TRUE> }T
-T{ 1 0 0 WITHIN -> <FALSE> }T
-T{ 1 0 1 WITHIN -> <FALSE> }T
-T{ 1 0 MAX-INT WITHIN -> <TRUE> }T
-T{ 1 1 MIN-INT WITHIN -> <TRUE> }T
-T{ 1 1 0 WITHIN -> <TRUE> }T
-T{ 1 1 1 WITHIN -> <FALSE> }T
-T{ 1 1 MAX-INT WITHIN -> <TRUE> }T
-T{ 1 MAX-INT MIN-INT WITHIN -> <FALSE> }T
-T{ 1 MAX-INT 0 WITHIN -> <FALSE> }T
-T{ 1 MAX-INT 1 WITHIN -> <FALSE> }T
-T{ 1 MAX-INT MAX-INT WITHIN -> <FALSE> }T
-T{ MAX-INT MIN-INT MIN-INT WITHIN -> <FALSE> }T
-T{ MAX-INT MIN-INT 0 WITHIN -> <FALSE> }T
-T{ MAX-INT MIN-INT 1 WITHIN -> <FALSE> }T
-T{ MAX-INT MIN-INT MAX-INT WITHIN -> <FALSE> }T
-T{ MAX-INT 0 MIN-INT WITHIN -> <TRUE> }T
-T{ MAX-INT 0 0 WITHIN -> <FALSE> }T
-T{ MAX-INT 0 1 WITHIN -> <FALSE> }T
-T{ MAX-INT 0 MAX-INT WITHIN -> <FALSE> }T
-T{ MAX-INT 1 MIN-INT WITHIN -> <TRUE> }T
-T{ MAX-INT 1 0 WITHIN -> <TRUE> }T
-T{ MAX-INT 1 1 WITHIN -> <FALSE> }T
-T{ MAX-INT 1 MAX-INT WITHIN -> <FALSE> }T
-T{ MAX-INT MAX-INT MIN-INT WITHIN -> <TRUE> }T
-T{ MAX-INT MAX-INT 0 WITHIN -> <TRUE> }T
-T{ MAX-INT MAX-INT 1 WITHIN -> <TRUE> }T
-T{ MAX-INT MAX-INT MAX-INT WITHIN -> <FALSE> }T
+T{ MIN-INT MIN-INT MIN-INT WITHIN -> FALSE }T
+T{ MIN-INT MIN-INT 0 WITHIN -> TRUE }T
+T{ MIN-INT MIN-INT 1 WITHIN -> TRUE }T
+T{ MIN-INT MIN-INT MAX-INT WITHIN -> TRUE }T
+T{ MIN-INT 0 MIN-INT WITHIN -> FALSE }T
+T{ MIN-INT 0 0 WITHIN -> FALSE }T
+T{ MIN-INT 0 1 WITHIN -> FALSE }T
+T{ MIN-INT 0 MAX-INT WITHIN -> FALSE }T
+T{ MIN-INT 1 MIN-INT WITHIN -> FALSE }T
+T{ MIN-INT 1 0 WITHIN -> TRUE }T
+T{ MIN-INT 1 1 WITHIN -> FALSE }T
+T{ MIN-INT 1 MAX-INT WITHIN -> FALSE }T
+T{ MIN-INT MAX-INT MIN-INT WITHIN -> FALSE }T
+T{ MIN-INT MAX-INT 0 WITHIN -> TRUE }T
+T{ MIN-INT MAX-INT 1 WITHIN -> TRUE }T
+T{ MIN-INT MAX-INT MAX-INT WITHIN -> FALSE }T
+T{ 0 MIN-INT MIN-INT WITHIN -> FALSE }T
+T{ 0 MIN-INT 0 WITHIN -> FALSE }T
+T{ 0 MIN-INT 1 WITHIN -> TRUE }T
+T{ 0 MIN-INT MAX-INT WITHIN -> TRUE }T
+T{ 0 0 MIN-INT WITHIN -> TRUE }T
+T{ 0 0 0 WITHIN -> FALSE }T
+T{ 0 0 1 WITHIN -> TRUE }T
+T{ 0 0 MAX-INT WITHIN -> TRUE }T
+T{ 0 1 MIN-INT WITHIN -> FALSE }T
+T{ 0 1 0 WITHIN -> FALSE }T
+T{ 0 1 1 WITHIN -> FALSE }T
+T{ 0 1 MAX-INT WITHIN -> FALSE }T
+T{ 0 MAX-INT MIN-INT WITHIN -> FALSE }T
+T{ 0 MAX-INT 0 WITHIN -> FALSE }T
+T{ 0 MAX-INT 1 WITHIN -> TRUE }T
+T{ 0 MAX-INT MAX-INT WITHIN -> FALSE }T
+T{ 1 MIN-INT MIN-INT WITHIN -> FALSE }T
+T{ 1 MIN-INT 0 WITHIN -> FALSE }T
+T{ 1 MIN-INT 1 WITHIN -> FALSE }T
+T{ 1 MIN-INT MAX-INT WITHIN -> TRUE }T
+T{ 1 0 MIN-INT WITHIN -> TRUE }T
+T{ 1 0 0 WITHIN -> FALSE }T
+T{ 1 0 1 WITHIN -> FALSE }T
+T{ 1 0 MAX-INT WITHIN -> TRUE }T
+T{ 1 1 MIN-INT WITHIN -> TRUE }T
+T{ 1 1 0 WITHIN -> TRUE }T
+T{ 1 1 1 WITHIN -> FALSE }T
+T{ 1 1 MAX-INT WITHIN -> TRUE }T
+T{ 1 MAX-INT MIN-INT WITHIN -> FALSE }T
+T{ 1 MAX-INT 0 WITHIN -> FALSE }T
+T{ 1 MAX-INT 1 WITHIN -> FALSE }T
+T{ 1 MAX-INT MAX-INT WITHIN -> FALSE }T
+T{ MAX-INT MIN-INT MIN-INT WITHIN -> FALSE }T
+T{ MAX-INT MIN-INT 0 WITHIN -> FALSE }T
+T{ MAX-INT MIN-INT 1 WITHIN -> FALSE }T
+T{ MAX-INT MIN-INT MAX-INT WITHIN -> FALSE }T
+T{ MAX-INT 0 MIN-INT WITHIN -> TRUE }T
+T{ MAX-INT 0 0 WITHIN -> FALSE }T
+T{ MAX-INT 0 1 WITHIN -> FALSE }T
+T{ MAX-INT 0 MAX-INT WITHIN -> FALSE }T
+T{ MAX-INT 1 MIN-INT WITHIN -> TRUE }T
+T{ MAX-INT 1 0 WITHIN -> TRUE }T
+T{ MAX-INT 1 1 WITHIN -> FALSE }T
+T{ MAX-INT 1 MAX-INT WITHIN -> FALSE }T
+T{ MAX-INT MAX-INT MIN-INT WITHIN -> TRUE }T
+T{ MAX-INT MAX-INT 0 WITHIN -> TRUE }T
+T{ MAX-INT MAX-INT 1 WITHIN -> TRUE }T
+T{ MAX-INT MAX-INT MAX-INT WITHIN -> FALSE }T
 
 \ -----------------------------------------------------------------------------
 TESTING UNUSED  (contributed by James Bowman & Peter Knaggs)
@@ -347,11 +328,11 @@ T{ MARKER MA0 -> }T
 T{ : MA1 111 ; -> }T
 T{ MARKER MA2 -> }T
 T{ : MA1 222 ; -> }T
-T{ MA? MA0 MA? MA1 MA? MA2 -> <TRUE> <TRUE> <TRUE> }T
+T{ MA? MA0 MA? MA1 MA? MA2 -> TRUE TRUE TRUE }T
 T{ MA1 MA2 MA1 -> 222 111 }T
-T{ MA? MA0 MA? MA1 MA? MA2 -> <TRUE> <TRUE> <FALSE> }T
+T{ MA? MA0 MA? MA1 MA? MA2 -> TRUE TRUE FALSE }T
 T{ MA0 -> }T
-T{ MA? MA0 MA? MA1 MA? MA2 -> <FALSE> <FALSE> <FALSE> }T
+T{ MA? MA0 MA? MA1 MA? MA2 -> FALSE FALSE FALSE }T
 
 \ -----------------------------------------------------------------------------
 TESTING ?DO
@@ -548,32 +529,6 @@ T{ 123 AS1 -> 246 }T
 \ -----------------------------------------------------------------------------
 \ Cannot automatically test SAVE-INPUT and RESTORE-INPUT from a console source
 
-TESTING SAVE-INPUT and RESTORE-INPUT with a file source
-
-VARIABLE SIV -1 SIV !
-
-: NEVEREXECUTED
-   CR ." This should never be executed" CR
-;
-
-T{ 11111 SAVE-INPUT
-
-SIV @
-
-[IF]
-   0 SIV !
-   RESTORE-INPUT
-   NEVEREXECUTED
-   33333
-[ELSE]
-
-TESTING the -[ELSE]- part is executed
-22222
-
-[THEN]
-
-   -> 11111 0 22222 }T   \ 0 comes from RESTORE-INPUT
-
 TESTING SAVE-INPUT and RESTORE-INPUT with a string source
 
 VARIABLE SI_INC 0 SI_INC !
@@ -586,40 +541,6 @@ VARIABLE SI_INC 0 SI_INC !
 : S$ S" SAVE-INPUT SI1 RESTORE-INPUT 12345" ;
 
 T{ S$ EVALUATE SI_INC @ -> 0 2345 15 }T
-
-TESTING nested SAVE-INPUT, RESTORE-INPUT and REFILL from a file
-
-: READ_A_LINE
-   REFILL 0=
-   ABORT" REFILL FAILED"
-;
-
-0 SI_INC !
-
-CREATE 2RES -1 , -1 ,   \ Don't use 2VARIABLE from Double number word set 
-
-: SI2
-   READ_A_LINE
-   READ_A_LINE
-   SAVE-INPUT
-   READ_A_LINE
-   READ_A_LINE
-   S$ EVALUATE 2RES 2!
-   RESTORE-INPUT
-;
-
-\ WARNING: do not delete or insert lines of text after si2 is called
-\ otherwise the next test will fail
-
-T{ SI2
-33333               \ This line should be ignored
-2RES 2@ 44444      \ RESTORE-INPUT should return to this line
-
-55555
-TESTING the nested results
- -> 0 0 2345 44444 55555 }T
-
-\ End of warning
 
 \ -----------------------------------------------------------------------------
 TESTING .(
@@ -637,7 +558,7 @@ T{ : IMM? BL WORD FIND NIP ; IMM? .( -> 1 }T
 \ -----------------------------------------------------------------------------
 TESTING .R and U.R - has to handle different cell sizes
 
-\ Create some large integers
+\ Create some large integers just below/above MAX and Min INTs
 MAX-INT 73 79 */ CONSTANT LI1
 MIN-INT 71 73 */ CONSTANT LI2
 
