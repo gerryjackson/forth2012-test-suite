@@ -24,7 +24,7 @@ The word sets tested are:
 - The Search-Order word set and extensions
 - The String word set
 
-**Block test warning - in the file blocktest.fth the block numbers tested are in the range 20 to 29 and will be overwritten when the test is run. The block numbers can be changed at the start of the file.**
+**Block test warning - in the file blocktest.fth the block numbers tested are in the range 20 to 29 and will be overwritten when the test is run. These block numbers can be changed at the start of the file.**
 
 The master branch is version 0.13 (27 Nov 2015) of the test suite.
 
