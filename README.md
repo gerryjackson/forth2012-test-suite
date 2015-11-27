@@ -12,7 +12,7 @@ extends and supersedes ANS Forth.
 The word sets tested are:
 - Core words (by John Hayes) plus some additional tests
 - Core extension words
-- The Block word set and extensions
+- The Block word set and extensions (see the warning below)
 - The Double Number word set and extensions
 - The Exception word set and extensions
 - The Facility word set extensions (structures only)
@@ -23,6 +23,8 @@ The word sets tested are:
   few words in each)
 - The Search-Order word set and extensions
 - The String word set
+
+**Block test warning - in the file blocktest.fth the block numbers tested are in the range 20 to 29 and will be overwritten when the test is run. The block numbers can be changed at the start of the file.**
 
 The master branch is version 0.13 (27 Nov 2015) of the test suite.
 
