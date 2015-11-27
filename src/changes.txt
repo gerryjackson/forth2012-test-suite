@@ -47,7 +47,7 @@ localstest.fth
      words being available from the Seach-order wordset
 
 runtests.fth
-   - includes blocktest.fth and utilities.fth
+   - includes blocktest.fth
 
 searchordertest.fth
    - Interpretive use of S" replaced by $" from utilities.fth
