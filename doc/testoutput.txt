@@ -179,7 +179,7 @@ Screen 29 not modified
 14
 15
 ***Given Characters per Line: 64
-<7> 1 2 3 -1 10 11 12 *
+*
 End of Block word tests
 *****************
 You should see lines duplicated:
