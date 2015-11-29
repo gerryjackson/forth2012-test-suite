@@ -14,7 +14,7 @@
 \ Version 0.13 S" in interpretation mode tested.
 \              Added SAVE-INPUT RESTORE-INPUT REFILL in a file, (moved from
 \              coreexttest.fth).
-\              Calls to COMPARE replaced with STR= (in utilities.fth) 
+\              Calls to COMPARE replaced with S= (in utilities.fth) 
 \         0.11 25 April 2015 S\" in interpretation mode test added
 \              REQUIRED REQUIRE INCLUDE tests added
 \              Two S" and/or S\" buffers availability tested
@@ -86,15 +86,15 @@ VARIABLE #CHARS
 T{ FN1 R/O OPEN-FILE SWAP FID1 ! -> 0 }T
 T{ FID1 @ FILE-POSITION -> 0. 0 }T
 T{ BUF 100 FID1 @ READ-LINE ROT DUP #CHARS ! -> TRUE 0 LINE1 SWAP DROP }T
-T{ BUF #CHARS @ LINE1 STR= -> TRUE }T
+T{ BUF #CHARS @ LINE1 S= -> TRUE }T
 T{ FID1 @ CLOSE-FILE -> 0 }T
 
 \ ------------------------------------------------------------------------------
 TESTING S" in interpretation mode (compile mode tested in Core tests)
 
-T{ S" abcdef" $" abcdef" STR= -> TRUE }T
-T{ S" " $" " STR= -> TRUE }T
-T{ S" ghi"$" ghi" STR= -> TRUE }T
+T{ S" abcdef" $" abcdef" S= -> TRUE }T
+T{ S" " $" " S= -> TRUE }T
+T{ S" ghi"$" ghi" S= -> TRUE }T
 
 \ ------------------------------------------------------------------------------
 TESTING R/W WRITE-FILE REPOSITION-FILE READ-FILE FILE-POSITION S"
@@ -112,7 +112,7 @@ T{ FID1 @ FILE-POSITION -> 10. 0 }T
 T{ 0. FID1 @ REPOSITION-FILE -> 0 }T
 T{ RL1 -> LINE1 SWAP DROP TRUE 0 }T
 T{ RL1 ROT DUP #CHARS ! -> TRUE 0 LINE2 SWAP DROP }T
-T{ BUF #CHARS @ LINE2 STR= -> TRUE }T
+T{ BUF #CHARS @ LINE2 S= -> TRUE }T
 T{ RL1 -> 0 FALSE 0 }T
 T{ FID1 @ FILE-POSITION ROT ROT FP 2! -> 0 }T
 T{ FP 2@ FID1 @ FILE-SIZE DROP D= -> TRUE }T
@@ -140,10 +140,10 @@ T{ PAD 50 FID2 @ WRITE-FILE FID2 @ FLUSH-FILE -> 0 0 }T
 T{ FID2 @ FILE-SIZE -> 50. 0 }T
 T{ 0. FID2 @ REPOSITION-FILE -> 0 }T
 T{ CBUF BUF 29 FID2 @ READ-FILE -> 29 0 }T
-T{ PAD 29 BUF 29 STR= -> TRUE }T
-T{ PAD 30 BUF 30 STR= -> FALSE }T
+T{ PAD 29 BUF 29 S= -> TRUE }T
+T{ PAD 30 BUF 30 S= -> FALSE }T
 T{ CBUF BUF 29 FID2 @ READ-FILE -> 21 0 }T
-T{ PAD 29 + 21 BUF 21 STR= -> TRUE }T
+T{ PAD 29 + 21 BUF 21 S= -> TRUE }T
 T{ FID2 @ FILE-SIZE DROP FID2 @ FILE-POSITION DROP D= -> TRUE }T
 T{ BUF 10 FID2 @ READ-FILE -> 0 0 }T
 T{ FID2 @ CLOSE-FILE -> 0 }T
@@ -156,13 +156,13 @@ T{ 37. FID2 @ RESIZE-FILE -> 0 }T
 T{ FID2 @ FILE-SIZE -> 37. 0 }T
 T{ 0. FID2 @ REPOSITION-FILE -> 0 }T
 T{ CBUF BUF 100 FID2 @ READ-FILE -> 37 0 }T
-T{ PAD 37 BUF 37 STR= -> TRUE }T
-T{ PAD 38 BUF 38 STR= -> FALSE }T
+T{ PAD 37 BUF 37 S= -> TRUE }T
+T{ PAD 38 BUF 38 S= -> FALSE }T
 T{ 500. FID2 @ RESIZE-FILE -> 0 }T
 T{ FID2 @ FILE-SIZE -> 500. 0 }T
 T{ 0. FID2 @ REPOSITION-FILE -> 0 }T
 T{ CBUF BUF 100 FID2 @ READ-FILE -> 100 0 }T
-T{ PAD 37 BUF 37 STR= -> TRUE }T
+T{ PAD 37 BUF 37 S= -> TRUE }T
 T{ FID2 @ CLOSE-FILE -> 0 }T
 
 \ ------------------------------------------------------------------------------
@@ -226,16 +226,16 @@ TESTING S\" (Forth 2012 interpretation mode)
 
 \ S\" in compilation mode already tested in Core Extension tests
 T{ : SSQ10 S\" \a\b\e\f\l\m\q\r\t\v\x0F0\x1Fa\xaBx\z\"\\" ; -> }T
-T{ S\" \a\b\e\f\l\m\q\r\t\v\x0F0\x1Fa\xaBx\z\"\\" SSQ10  STR= -> TRUE }T
+T{ S\" \a\b\e\f\l\m\q\r\t\v\x0F0\x1Fa\xaBx\z\"\\" SSQ10  S= -> TRUE }T
 
 \ ------------------------------------------------------------------------------
 TESTING two buffers available for S" and/or S\" (Forth 2012)
 
 : SSQ11 S" abcd" ;   : SSQ12 S" 1234" ;
-T{ S" abcd"  S" 1234" SSQ12  STR= ROT ROT SSQ11 STR= -> TRUE TRUE }T
-T{ S\" abcd" S\" 1234" SSQ12 STR= ROT ROT SSQ11 STR= -> TRUE TRUE }T
-T{ S" abcd"  S\" 1234" SSQ12 STR= ROT ROT SSQ11 STR= -> TRUE TRUE }T
-T{ S\" abcd" S" 1234" SSQ12  STR= ROT ROT SSQ11 STR= -> TRUE TRUE }T
+T{ S" abcd"  S" 1234" SSQ12  S= ROT ROT SSQ11 S= -> TRUE TRUE }T
+T{ S\" abcd" S\" 1234" SSQ12 S= ROT ROT SSQ11 S= -> TRUE TRUE }T
+T{ S" abcd"  S\" 1234" SSQ12 S= ROT ROT SSQ11 S= -> TRUE TRUE }T
+T{ S\" abcd" S" 1234" SSQ12  S= ROT ROT SSQ11 S= -> TRUE TRUE }T
 
 
 \ ------------------------------------------------------------------------------
