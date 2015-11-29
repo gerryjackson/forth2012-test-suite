@@ -17,7 +17,7 @@
 \              Moved SAVE-INPUT and RESTORE-INPUT tests in a file to filetest.fth
 \              Use of 2VARIABLE (from optional wordset) replaced with CREATE.
 \              Minor lower to upper case conversions.
-\              Calls to COMPARE replaced by STR= (in utilities.fth) to avoid use
+\              Calls to COMPARE replaced by S= (in utilities.fth) to avoid use
 \              of a word from an optional word set.
 \              UNUSED tests revised as UNUSED UNUSED = may return FALSE when an
 \              implementation has the data stack sharing unused dataspace.
@@ -636,8 +636,8 @@ T{ CHAR " PARSE 4567 "DUP ROT ROT EVALUATE -> 5 4567 }T
 TESTING PARSE-NAME  (Forth 2012)
 \ Adapted from the PARSE-NAME RfD tests
 
-T{ PARSE-NAME abcd  STR1  STR= -> TRUE }T        \ No leading spaces
-T{ PARSE-NAME      abcde STR2 STR= -> TRUE }T    \ Leading spaces
+T{ PARSE-NAME abcd  STR1  S= -> TRUE }T        \ No leading spaces
+T{ PARSE-NAME      abcde STR2 S= -> TRUE }T    \ Leading spaces
 
 \ Test empty parse area, new lines are necessary
 T{ PARSE-NAME
@@ -647,7 +647,7 @@ T{ PARSE-NAME
   NIP -> 0 }T
 
 T{ : PARSE-NAME-TEST ( "name1" "name2" -- n )
-    PARSE-NAME PARSE-NAME STR= ; -> }T
+    PARSE-NAME PARSE-NAME S= ; -> }T
 T{ PARSE-NAME-TEST abcd abcd  -> TRUE }T
 T{ PARSE-NAME-TEST abcd   abcd  -> TRUE }T  \ Leading spaces
 T{ PARSE-NAME-TEST abcde abcdf -> FALSE }T
@@ -697,11 +697,11 @@ TESTING HOLDS  (Forth 2012)
 : HTEST S" Testing HOLDS" ;
 : HTEST2 S" works" ;
 : HTEST3 S" Testing HOLDS works 123" ;
-T{ 0 0 <#  HTEST HOLDS #> HTEST STR= -> TRUE }T
+T{ 0 0 <#  HTEST HOLDS #> HTEST S= -> TRUE }T
 T{ 123 0 <# #S BL HOLD HTEST2 HOLDS BL HOLD HTEST HOLDS #>
-   HTEST3 STR= -> TRUE }T
+   HTEST3 S= -> TRUE }T
 T{ : HLD HOLDS ; -> }T
-T{ 0 0 <#  HTEST HLD #> HTEST STR= -> TRUE }T
+T{ 0 0 <#  HTEST HLD #> HTEST S= -> TRUE }T
 
 \ -----------------------------------------------------------------------------
 TESTING REFILL SOURCE-ID
@@ -718,7 +718,7 @@ TESTING S\"  (Forth 2012 compilation mode)
 \ interpretation semantics. S\" in interpretation mode is tested in the tests on
 \ the File-Access word set
 
-T{ : SSQ1 S\" abc" S" abc" STR= ; -> }T  \ No escapes
+T{ : SSQ1 S\" abc" S" abc" S= ; -> }T  \ No escapes
 T{ SSQ1 -> TRUE }T
 T{ : SSQ2 S\" " ; SSQ2 SWAP DROP -> 0 }T    \ Empty string
 
@@ -753,7 +753,7 @@ CR .( another line)
 T{ : SSQ4 S\" \nOne line...\nanotherLine\n" type ; SSQ4 -> }T
 
 \ Test bare escapable characters appear as themselves
-T{ : SSQ5 S\" abeflmnqrtvxz" S" abeflmnqrtvxz" STR= ; SSQ5 -> TRUE }T
+T{ : SSQ5 S\" abeflmnqrtvxz" S" abeflmnqrtvxz" S= ; SSQ5 -> TRUE }T
 
 T{ : SSQ6 S\" a\""2DROP 1111 ; SSQ6 -> 1111 }T \ Parsing behaviour
 
