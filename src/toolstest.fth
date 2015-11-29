@@ -14,7 +14,7 @@
 \ Version 0.13 31 October 2015 More tests on [ELSE] and [THEN]
 \              TRAVERSE-WORDLIST etc tests made conditional on the required
 \              search-order words being available
-\              Calls to COMPARE replaced with STR= (in utilities.fth)
+\              Calls to COMPARE replaced with S= (in utilities.fth)
 \         0.11 25 April Added tests for N>R NR> SYNONYM TRAVERSE-WORDLIST
 \              NAME>COMPILE NAME>INTERPRET NAME>STRING
 \         0.6  1 April 2012 Tests placed in the public domain.
@@ -285,7 +285,7 @@ T{ : SYN3 SYN2 LITERAL ; SYN3 -> 2345 }T
 
 \ Compare string (caddr u) with name associated with nt
 \? : NAME?  ( caddr u nt -- caddr u f )   \ f = true for name = (caddr u) string
-\?    NAME>STRING >UPPERCASE 2OVER STR=
+\?    NAME>STRING >UPPERCASE 2OVER S=
 \? ;
 
 \ The word to be executed by TRAVERSE-WORDLIST
