@@ -216,6 +216,7 @@ T{ %10010110. -> 150. }T
 T{ %-10010110 -> -150 }T
 T{ %-10010110. -> -150. }T
 T{ 'z' -> 122 }T
+T{ 'Z' -> 90 }T
 \ Check BASE is unchanged
 T{ BASE @ OLD-BASE @ = -> <TRUE> }T
 
@@ -234,6 +235,7 @@ T{ %10010110. -> 96. }T
 T{ %-10010110 -> -96 }T
 T{ %-10010110. -> -96. }T
 T{ 'z' -> 7a }T
+T{ 'Z' -> 5a }T
 \ Check BASE is unchanged
 T{ BASE @ OLD-BASE @ = -> <TRUE> }T   \ 2
 
