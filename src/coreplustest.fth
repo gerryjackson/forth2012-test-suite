@@ -239,8 +239,8 @@ T{ !"#$%&'()*+,-./0123456789:;<=>? -> 1 }T
 T{ @ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^ -> 2 }T
 : _`abcdefghijklmnopqrstuvwxyz{|} 3 ;
 T{ _`abcdefghijklmnopqrstuvwxyz{|} -> 3 }T
-: ~ 4 ;
-T{ ~ -> 4 }T
+: ~~~~ 4 ;
+T{ ~~~~ -> 4 }T
 
 \ ------------------------------------------------------------------------------
 
