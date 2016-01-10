@@ -48,12 +48,38 @@ MAX-INTD 2/     CONSTANT HI-INT     \ 001...1
 MIN-INTD 2/     CONSTANT LO-INT     \ 110...1
 
 \ ------------------------------------------------------------------------------
-TESTING interpreter and compiler reading a double number
+TESTING interpreter and compiler reading double numbers, with/without prefixes
 
 T{ 1. -> 1 0 }T
 T{ -2. -> -2 -1 }T
 T{ : RDL1 3. ; RDL1 -> 3 0 }T
 T{ : RDL2 -4. ; RDL2 -> -4 -1 }T
+
+VARIABLE OLD-DBASE
+DECIMAL BASE @ OLD-DBASE !
+T{ #12346789. -> 12346789. }T
+T{ #-12346789. -> -12346789. }T
+T{ $12aBcDeF. -> 313249263. }T
+T{ $-12AbCdEf. -> -313249263. }T
+T{ %10010110. -> 150. }T
+T{ %-10010110. -> -150. }T
+\ Check BASE is unchanged
+T{ BASE @ OLD-DBASE @ = -> <TRUE> }T
+
+\ Repeat in Hex mode
+16 OLD-DBASE ! 16 BASE !
+T{ #12346789. -> BC65A5. }T
+T{ #-12346789. -> -BC65A5. }T
+T{ $12aBcDeF. -> 12AbCdeF. }T
+T{ $-12AbCdEf. -> -12ABCDef. }T
+T{ %10010110. -> 96. }T
+T{ %-10010110. -> -96. }T
+\ Check BASE is unchanged
+T{ BASE @ OLD-DBASE @ = -> <TRUE> }T   \ 2
+
+DECIMAL
+\ Check number prefixes in compile mode
+T{ : dnmp  #8327. $-2cbe. %011010111. ; dnmp -> 8327. -11454. 215. }T
 
 \ ------------------------------------------------------------------------------
 TESTING 2CONSTANT
