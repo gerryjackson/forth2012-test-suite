@@ -210,6 +210,7 @@ T{ $-12eF -> -4847 }T
 T{ %10010110 -> 150 }T
 T{ %-10010110 -> -150 }T
 T{ 'z' -> 122 }T
+T{ 'Z' -> 90 }T
 \ Check BASE is unchanged
 T{ BASE @ OLD-BASE @ = -> <TRUE> }T
 
@@ -222,6 +223,7 @@ T{ $-12eF -> -12EF }T
 T{ %10010110 -> 96 }T
 T{ %-10010110 -> -96 }T
 T{ 'z' -> 7a }T
+T{ 'Z' -> 5a }T
 \ Check BASE is unchanged
 T{ BASE @ OLD-BASE @ = -> <TRUE> }T   \ 2
 
@@ -229,6 +231,16 @@ DECIMAL
 \ Check number prefixes in compile mode
 T{ : nmp  #8327 $-2cbe %011010111 ''' ; nmp -> 8327 -11454 215 39 }T
 
+TESTING definition names
+\ should support {1..31} graphical characters
+: !"#$%&'()*+,-./0123456789:;<=>? 1 ;
+T{ !"#$%&'()*+,-./0123456789:;<=>? -> 1 }T
+: @ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^ 2 ;
+T{ @ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^ -> 2 }T
+: _`abcdefghijklmnopqrstuvwxyz{|} 3 ;
+T{ _`abcdefghijklmnopqrstuvwxyz{|} -> 3 }T
+: ~ 4 ;
+T{ ~ -> 4 }T
 
 \ ------------------------------------------------------------------------------
 
