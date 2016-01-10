@@ -471,7 +471,7 @@ T{ 2RND-TEST-BLOCKS 2DUP TL6 SWAP LOAD = -> TRUE }T
 \ are not returned, then the tests quits with a trivial Pass
 : TL7 ( blk1 blk2 -- u1 u2 rnd2 blk2-addr rnd1' rnd1 )
     OVER BUFFER OVER BUFFER = IF        \ test needs 2 distinct buffers
-        2DROP DROP 0 0 0 0 0 0          \ Dummy result
+        2DROP 0 0 0 0 0 0               \ Dummy result
     ELSE
         OVER BLOCK-RND DUP ROT TL1 >R   \ blk1 blk2
         DUP S" SOURCE DROP" WRITE-BLOCK \ blk1 blk2
@@ -650,7 +650,7 @@ T{ 2 RND-TEST-BLOCK-SEQ DUP TCSIRIR3 LOAD -> 1 2 3 -1 10 11 12 }T
         S" 0 T-CNT !"                   WRITE-BLOCK-LINE
         S" <# MARK A SAVE-INPUT MARK B" WRITE-BLOCK-LINE
         S" MARK C REFILL MARK D"        WRITE-BLOCK-LINE
-        DROP 1+ BLANK-BUFFER
+        DROP UPDATE 1+ BLANK-BUFFER
         S" MARK E ABS CHAR 0 + HOLD"    WRITE-BLOCK-LINE
 S" 1 T-CNT +! MARK F ' RESTORE-INPUT T-CNT @ 2 < ?EXECUTE MARK G" WRITE-BLOCK-LINE
         S" MARK H 0 0 #>"               WRITE-BLOCK-LINE
