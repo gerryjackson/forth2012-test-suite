@@ -231,6 +231,7 @@ DECIMAL
 \ Check number prefixes in compile mode
 T{ : nmp  #8327 $-2cbe %011010111 ''' ; nmp -> 8327 -11454 215 39 }T
 
+\ ------------------------------------------------------------------------------
 TESTING definition names
 \ should support {1..31} graphical characters
 : !"#$%&'()*+,-./0123456789:;<=>? 1 ;
@@ -239,8 +240,9 @@ T{ !"#$%&'()*+,-./0123456789:;<=>? -> 1 }T
 T{ @ABCDEFGHIJKLMNOPQRSTUVWXYZ[\]^ -> 2 }T
 : _`abcdefghijklmnopqrstuvwxyz{|} 3 ;
 T{ _`abcdefghijklmnopqrstuvwxyz{|} -> 3 }T
-: ~~~~ 4 ;
-T{ ~~~~ -> 4 }T
+: _`abcdefghijklmnopqrstuvwxyz{|~ 4 ;     \ Last character different
+T{ _`abcdefghijklmnopqrstuvwxyz{|~ -> 4 }T
+T{ _`abcdefghijklmnopqrstuvwxyz{|} -> 3 }T
 
 \ ------------------------------------------------------------------------------
 
