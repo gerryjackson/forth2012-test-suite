@@ -26,7 +26,7 @@ The word sets tested are:
 
 **Block test warning - in the file blocktest.fth the block numbers tested are in the range 20 to 29 and will be overwritten when the test is run. These block numbers can be changed at the start of the file.**
 
-The master branch is version 0.13 (27 Nov 2015) of the test suite.
+The master branch has minor updates to release 0.13 (27 Nov 2015) of the test suite.
 
 The tests are not comprehensive, no claim is made about their being correct and no warranty is provided. However previous versions have been run successfully with such widely used systems as GForth, VFX Forth, SwiftForth and Win32 Forth, any failing tests being due to the Forth system rather than the tests themselves. Any bugs in the tests should be reported by raising a new issue.
 
