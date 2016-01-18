@@ -1,6 +1,23 @@
 Record of changes to the ANS Forth and Forth 2012 test suite
 from version 0.9 onwards
 
+Version 0.13.1
+~~~~~~~~~~~~~~
+blocktest.fth
+   - fixed issue #7 faults with single buffer blocks
+
+core.fth
+   - corrected ACCEPT buffer block length to decimal 80 characters
+
+coreplustest.fth 
+   - moved double number with prefixes to doubletest.fth
+   - now tests maximum length definition names and all graphical characters accepted
+   - parses upper case characters using 'X' notation
+   - tests FIND with zero length strings and non-existent names
+
+doubletest.fth
+   - received double number with prefixes from coreplus.fth
+
 Version 0.13
 ~~~~~~~~~~~~
 
