@@ -245,5 +245,20 @@ T{ _`abcdefghijklmnopqrstuvwxyz{|~ -> 4 }T
 T{ _`abcdefghijklmnopqrstuvwxyz{|} -> 3 }T
 
 \ ------------------------------------------------------------------------------
+TESTING FIND with a zero length string and a non-existent word
+
+CREATE EMPTYSTRING 0 C,
+: EMPTYSTRING-FIND-CHECK ( c-addr 0 | xt 1 | xt -1 -- t|f )
+    DUP IF ." FIND returns a TRUE value for an empty string!" CR THEN
+    0= SWAP EMPTYSTRING = = ;
+T{ EMPTYSTRING FIND EMPTYSTRING-FIND-CHECK -> <TRUE> }T
+
+CREATE NON-EXISTENT-WORD   \ Same as in exceptiontest.fth
+       15 C, CHAR $ C, CHAR $ C, CHAR Q C, CHAR W C, CHAR E C, CHAR Q C,
+   CHAR W C, CHAR E C, CHAR Q C, CHAR W C, CHAR E C, CHAR R C, CHAR T C,
+   CHAR $ C, CHAR $ C,
+T{ NON-EXISTENT-WORD FIND -> NON-EXISTENT-WORD 0 }T
+
+\ ------------------------------------------------------------------------------
 
 CR .( End of additional Core tests) CR
