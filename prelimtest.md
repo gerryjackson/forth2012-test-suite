@@ -1,4 +1,4 @@
-#  System Test Bootstrap #
+#  Preliminary Test Program #
 
 ##  Rationale ##
 
