@@ -276,7 +276,7 @@ T{ : SYN3 SYN2 LITERAL ; SYN3 -> 2345 }T
 \? : >UPPERCASE  ( caddr u  -- caddr2 u2 )
 \?    32 MIN DUP >R UCBUF ROT ROT
 \?    OVER + SWAP
-\?    DO
+\?    ?DO
 \?       I C@ DUP [CHAR] a [CHAR] z 1+ WITHIN IF 32 INVERT AND THEN
 \?       OVER C! CHAR+
 \?    LOOP DROP
