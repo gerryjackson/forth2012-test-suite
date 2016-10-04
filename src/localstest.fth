@@ -111,9 +111,8 @@ TESTING system supplies at least 16 locals
 T{ LOC-ENVQ SWAP 15 > -> TRUE TRUE }T
 T{ : LT31 {: A B C D E F G H I J K L M N O P :}
              P O N M L K J I H G F E D C B A ; -> }T
-16 BASE !
-T{ 0 1 2 3 4 5 6 7 8 9 A B C D E F LT31 -> F E D C B A 9 8 7 6 5 4 3 2 1 0 }T
-DECIMAL             
+T{ 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 LT31
+          -> 15 14 13 12 11 10 9 8 7 6 5 4 3 2 1 0 }T
 
 TESTING (LOCAL)
 T{ : LOCAL BL WORD COUNT (LOCAL) ; IMMEDIATE -> }T
