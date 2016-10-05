@@ -160,81 +160,81 @@ T{ S1A DROP S14 DROP = -> FALSE }T
 \ ------------------------------------------------------------------------------
 TESTING UNESCAPE
 
-CREATE BUF 48 CHARS ALLOT
+CREATE SUBBUF 48 CHARS ALLOT
 
-\ $CHECK AND $CHECKN return f = 0 if caddr1 = buf and string1 = string2
-: $CHECK   ( caddr1 u1 caddr2 u2 -- f )  2SWAP OVER buf <> >R COMPARE R> or ;
+\ $CHECK AND $CHECKN return f = 0 if caddr1 = SUBBUF and string1 = string2
+: $CHECK   ( caddr1 u1 caddr2 u2 -- f )  2SWAP OVER SUBBUF <> >R COMPARE R> or ;
 : $CHECKN  ( caddr1 u1 n caddr2 u2 -- f n )  ROT >R $CHECK R> ;
 
-T{ 123 BUF C! $" " BUF UNESCAPE BUF 0 $CHECK -> FALSE }T
-T{ BUF C@ -> 123 }T
-T{ $" unchanged" buf UNESCAPE $" unchanged" $CHECK -> FALSE }T
-T{ $" %" BUF UNESCAPE $" %%" $CHECK -> FALSE }T
-T{ $" %%%" BUF UNESCAPE $" %%%%%%" $CHECK -> FALSE }T
-T{ $" abc%def" BUF UNESCAPE $" abc%%def" $CHECK -> FALSE }T
-T{ : TEST-UNESCAPE S" %abc%def%%ghi%" BUF UNESCAPE ; -> }T \ Compile check
+T{ 123 SUBBUF C! $" " SUBBUF UNESCAPE SUBBUF 0 $CHECK -> FALSE }T
+T{ SUBBUF C@ -> 123 }T
+T{ $" unchanged" SUBBUF UNESCAPE $" unchanged" $CHECK -> FALSE }T
+T{ $" %" SUBBUF UNESCAPE $" %%" $CHECK -> FALSE }T
+T{ $" %%%" SUBBUF UNESCAPE $" %%%%%%" $CHECK -> FALSE }T
+T{ $" abc%def" SUBBUF UNESCAPE $" abc%%def" $CHECK -> FALSE }T
+T{ : TEST-UNESCAPE S" %abc%def%%ghi%" SUBBUF UNESCAPE ; -> }T \ Compile check
 T{ TEST-UNESCAPE $" %%abc%%def%%%%ghi%%" $CHECK -> FALSE }T
 
 TESTING SUBSTITUTE REPLACES
 
-T{ $" abcdef" BUF 20 SUBSTITUTE $" abcdef" $CHECKN -> FALSE 0 }T \ Unchanged
-T{ $" " BUF 20 SUBSTITUTE $" " $CHECKN -> FALSE 0 }T           \ Zero length string
-T{ $" %%" BUF 20 SUBSTITUTE $" %" $CHECKN -> FALSE 0 }T         \ %% --> %
-T{ $" %%%%%%" BUF 25 SUBSTITUTE $" %%%" $CHECKN -> FALSE 0 }T
-T{ $" %%%%%%%" BUF 25 SUBSTITUTE $" %%%%" $CHECKN -> FALSE 0 }T \ Odd no. %'s
+T{ $" abcdef" SUBBUF 20 SUBSTITUTE $" abcdef" $CHECKN -> FALSE 0 }T \ Unchanged
+T{ $" " SUBBUF 20 SUBSTITUTE $" " $CHECKN -> FALSE 0 }T    \ Zero length string
+T{ $" %%" SUBBUF 20 SUBSTITUTE $" %" $CHECKN -> FALSE 0 }T        \ %% --> %
+T{ $" %%%%%%" SUBBUF 25 SUBSTITUTE $" %%%" $CHECKN -> FALSE 0 }T
+T{ $" %%%%%%%" SUBBUF 25 SUBSTITUTE $" %%%%" $CHECKN -> FALSE 0 }T \ Odd no. %'s
 
 : MAC1 S" mac1" ;  : MAC2 S" mac2" ;  : MAC3 S" mac3" ;
 
 T{ $" wxyz" MAC1 REPLACES -> }T
-T{ $" %mac1%" BUF 20 SUBSTITUTE $" wxyz" $CHECKN -> FALSE 1 }T
-T{ $" abc%mac1%d" BUF 20 SUBSTITUTE $" abcwxyzd" $CHECKN -> FALSE 1 }T
-T{ : SUBST BUF 20 SUBSTITUTE ; -> }T   \ Check it compiles
+T{ $" %mac1%" SUBBUF 20 SUBSTITUTE $" wxyz" $CHECKN -> FALSE 1 }T
+T{ $" abc%mac1%d" SUBBUF 20 SUBSTITUTE $" abcwxyzd" $CHECKN -> FALSE 1 }T
+T{ : SUBST SUBBUF 20 SUBSTITUTE ; -> }T   \ Check it compiles
 T{ $" defg%mac1%hi" SUBST $" defgwxyzhi" $CHECKN -> FALSE 1 }T
 T{ $" 12" MAC2 REPLACES -> }T
-T{ $" %mac1%mac2" BUF 20 SUBSTITUTE $" wxyzmac2" $CHECKN -> FALSE 1 }T
-T{ $" abc %mac2% def%mac1%gh" BUF 20 SUBSTITUTE $" abc 12 defwxyzgh" $CHECKN
+T{ $" %mac1%mac2" SUBBUF 20 SUBSTITUTE $" wxyzmac2" $CHECKN -> FALSE 1 }T
+T{ $" abc %mac2% def%mac1%gh" SUBBUF 20 SUBSTITUTE $" abc 12 defwxyzgh" $CHECKN
       -> FALSE 2 }T
 T{ : REPL  ( caddr1 u1 "name" -- )  PARSE-NAME REPLACES ; -> }T
 T{ $" " REPL MAC3 -> }T    \ Check compiled version
-T{ $" abc%mac3%def%mac1%gh" BUF 20 SUBSTITUTE $" abcdefwxyzgh" $CHECKN
+T{ $" abc%mac3%def%mac1%gh" SUBBUF 20 SUBSTITUTE $" abcdefwxyzgh" $CHECKN
       -> FALSE 2 }T      \ Zero length string substituted
-T{ $" %mac3%" BUF 10 SUBSTITUTE $" " $CHECKN
+T{ $" %mac3%" SUBBUF 10 SUBSTITUTE $" " $CHECKN
       -> FALSE 1 }T      \ Zero length string substituted
-T{ $" abc%%mac1%%%mac2%" BUF 20 SUBSTITUTE $" abc%mac1%12" $CHECKN
+T{ $" abc%%mac1%%%mac2%" SUBBUF 20 SUBSTITUTE $" abc%mac1%12" $CHECKN
       -> FALSE 1 }T   \ Check substitution is single pass
 T{ $" %mac3%" MAC3 REPLACES -> }T
-T{ $" a%mac3%b" BUF 20 SUBSTITUTE $" a%mac3%b" $CHECKN
+T{ $" a%mac3%b" SUBBUF 20 SUBSTITUTE $" a%mac3%b" $CHECKN
       -> FALSE 1 }T    \ Check non-recursive
 T{ $" %%" MAC3 REPLACES -> }T
-T{ $" abc%mac1%de%mac3%g%mac2%%%%mac1%hij" BUF 30 SUBSTITUTE
+T{ $" abc%mac1%de%mac3%g%mac2%%%%mac1%hij" SUBBUF 30 SUBSTITUTE
       $" abcwxyzde%%g12%wxyzhij" $CHECKN -> FALSE 4 }T
-T{ $" ab%mac4%c" BUF 20 SUBSTITUTE $" ab%mac4%c" $CHECKN
+T{ $" ab%mac4%c" SUBBUF 20 SUBSTITUTE $" ab%mac4%c" $CHECKN
       -> FALSE 0 }T   \ Non-substitution name passed unchanged
-T{ $" %mac2%%mac5%" BUF 20 SUBSTITUTE $" 12%mac5%" $CHECKN
+T{ $" %mac2%%mac5%" SUBBUF 20 SUBSTITUTE $" 12%mac5%" $CHECKN
       -> FALSE 1 }T   \ Non-substitution name passed unchanged
-T{ $" %mac5%" BUF 20 SUBSTITUTE $" %mac5%" $CHECKN
+T{ $" %mac5%" SUBBUF 20 SUBSTITUTE $" %mac5%" $CHECKN
       -> FALSE 0 }T   \ Non-substitution name passed unchanged
 
 \ Check UNESCAPE SUBSTITUTE leaves a string unchanged
-T{ $" %mac1%" BUF 30 CHARS + UNESCAPE BUF 10 SUBSTITUTE $" %mac1%" $CHECKN
+T{ $" %mac1%" SUBBUF 30 CHARS + UNESCAPE SUBBUF 10 SUBSTITUTE $" %mac1%" $CHECKN
    -> FALSE 0 }T
 
 \ Check with odd numbers of % characters, last is passed unchanged
-T{ $" %" BUF 10 SUBSTITUTE $" %" $CHECKN -> FALSE 0 }T
-T{ $" %abc" BUF 10 SUBSTITUTE $" %abc" $CHECKN -> FALSE 0 }T
-T{ $" abc%" BUF 10 SUBSTITUTE $" abc%" $CHECKN -> FALSE 0 }T
-T{ $" abc%mac1" BUF 10 SUBSTITUTE $" abc%mac1" $CHECKN -> FALSE 0 }T
-T{ $" abc%mac1%d%%e%mac2%%mac3" BUF 20 SUBSTITUTE
+T{ $" %" SUBBUF 10 SUBSTITUTE $" %" $CHECKN -> FALSE 0 }T
+T{ $" %abc" SUBBUF 10 SUBSTITUTE $" %abc" $CHECKN -> FALSE 0 }T
+T{ $" abc%" SUBBUF 10 SUBSTITUTE $" abc%" $CHECKN -> FALSE 0 }T
+T{ $" abc%mac1" SUBBUF 10 SUBSTITUTE $" abc%mac1" $CHECKN -> FALSE 0 }T
+T{ $" abc%mac1%d%%e%mac2%%mac3" SUBBUF 20 SUBSTITUTE
       $" abcwxyzd%e12%mac3" $CHECKN -> FALSE 2 }T
 
 \ Check for errors
-T{ $" abcd" BUF 4 SUBSTITUTE $" abcd" $CHECKN -> FALSE 0 }T  \ Just fits
-T{ $" abcd" BUF 3 SUBSTITUTE ROT ROT 2DROP 0< -> TRUE }T     \ Just too long
-T{ $" abcd" BUF 0 SUBSTITUTE ROT ROT 2DROP 0< -> TRUE }T
+T{ $" abcd" SUBBUF 4 SUBSTITUTE $" abcd" $CHECKN -> FALSE 0 }T  \ Just fits
+T{ $" abcd" SUBBUF 3 SUBSTITUTE ROT ROT 2DROP 0< -> TRUE }T     \ Just too long
+T{ $" abcd" SUBBUF 0 SUBSTITUTE ROT ROT 2DROP 0< -> TRUE }T
 T{ $" zyxwvutsr" MAC3 REPLACES -> }T
-T{ $" abc%mac3%d" BUF 10 SUBSTITUTE ROT ROT 2DROP 0< -> TRUE }T
+T{ $" abc%mac3%d" SUBBUF 10 SUBSTITUTE ROT ROT 2DROP 0< -> TRUE }T
 
-\ Conditional test for overlapping strings to go here including the case where
+\ Conditional test for overlapping strings, including the case where
 \ caddr1 = caddr2. If a system cannot handle overlapping strings it should
 \ return n < 0 with (caddr2 u2) undefined. If it can handle them correctly
 \ it should return the usual results for success. The following definition
@@ -269,9 +269,9 @@ T{ $" abc%mac3%d" BUF 10 SUBSTITUTE ROT ROT 2DROP 0< -> TRUE }T
 
 : OVERLAPPED-SUBST  ( caddr1 u1 u2 u3 u4 -- caddr5 u5 bufad n )
    >R >R                            ( -- caddr1 u1 u2 )  ( R: -- u4 u3 )
-   CHARS BUF + SWAP                 ( -- caddr1 buf+u2' u1 )
+   CHARS SUBBUF + SWAP                 ( -- caddr1 buf+u2' u1 )
    DUP >R OVER >R MOVE              ( -- )  ( R: -- u4 u3 u1 buf+u2') 
-   R> R> BUF R> CHARS + R>          ( -- buf+u2 u1 buf+u3' u4 )
+   R> R> SUBBUF R> CHARS + R>          ( -- buf+u2 u1 buf+u3' u4 )
    OVER >R SUBSTITUTE R> SWAP       ( -- caddr5 u5 buf+u3 n )
 ;
 
@@ -287,7 +287,7 @@ T{ $" a%mac3%b" 9 0 20 OVERLAPPED-SUBST 1 $" azyxwvutb" CHECK-SUBST -> TRUE }T
 \ Definition using a name on the stack
 : $CREATE  ( caddr u -- )
    S" name" REPLACES          ( -- )
-   S" CREATE %name%" BUF 40 SUBSTITUTE
+   S" CREATE %name%" SUBBUF 40 SUBSTITUTE
    0 > IF EVALUATE THEN
 ;
 t{ $" SUBST2" $CREATE 123 , -> }t
