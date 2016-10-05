@@ -10,7 +10,7 @@ DECIMAL
 ( [DEFINED] [IF] [ELSE] and [THEN] are in the optional Programming Tools     )
 ( word set.                                                                  )
 
-VARIABLE (\?) 0 (\?) !     ( Word defined/undefined flag )
+VARIABLE (\?) 0 (\?) !     ( Flag: Word defined = 0 | word undefined = -1 )
 
 ( [?DEF]  followed by [?IF] cannot be used again until after [THEN] )
 : [?DEF]  ( "name" -- )
