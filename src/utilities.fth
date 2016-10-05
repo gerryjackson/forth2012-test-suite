@@ -89,7 +89,7 @@ T{ [?DEF] ?DEFTEST2 \? : ?DEFTEST1 2 ;    \ Should be redefined
 \ mode when File-Access word set is defined
 
 64 CONSTANT SBUF-SIZE
-CREATE SBUF  SBUF-SIZE CHARS ALLOT
+CREATE SBUF1 SBUF-SIZE CHARS ALLOT
 CREATE SBUF2 SBUF-SIZE CHARS ALLOT
 
 \ ($") saves a counted string at (caddr)
@@ -99,10 +99,10 @@ CREATE SBUF2 SBUF-SIZE CHARS ALLOT
    2R>
 ;
 
-: $"   ( "ccc" -- caddr u )  SBUF  ($") ;
+: $"   ( "ccc" -- caddr u )  SBUF1 ($") ;
 : $2"  ( "ccc" -- caddr u )  SBUF2 ($") ;
 : $CLEAR  ( caddr -- ) SBUF-SIZE BL FILL ;
-: CLEAR-SBUFS  ( -- )  SBUF $CLEAR SBUF2 $CLEAR ;
+: CLEAR-SBUFS  ( -- )  SBUF1 $CLEAR SBUF2 $CLEAR ;
 
 \ More definitions in core.fr used in other test programs, conditionally
 \ defined here if core.fr has not been loaded
@@ -133,7 +133,11 @@ T{ STR1 STR3 S= -> FALSE }T
 T{ STR1 STR4 S= -> FALSE }T
 
 T{ CLEAR-SBUFS -> }T
-T{ $" abcdefghijklm"  SBUF  COUNT S= -> TRUE  }T
+T{ $" abcdefghijklm"  SBUF1 COUNT S= -> TRUE  }T
 T{ $" nopqrstuvwxyz"  SBUF2 OVER  S= -> FALSE }T
-T{ $2" abcdefghijklm" SBUF  COUNT S= -> FALSE }T
-T{ $2" nopqrstuvwxyz" SBUF  COUNT S= -> TRUE  }T
+T{ $2" abcdefghijklm" SBUF1 COUNT S= -> FALSE }T
+T{ $2" nopqrstuvwxyz" SBUF1 COUNT S= -> TRUE  }T
+
+\ ------------------------------------------------------------------------------
+
+CR $" Test utilities loaded" TYPE CR
