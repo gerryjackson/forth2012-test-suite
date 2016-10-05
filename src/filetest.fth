@@ -225,17 +225,17 @@ T{ 0
 TESTING S\" (Forth 2012 interpretation mode)
 
 \ S\" in compilation mode already tested in Core Extension tests
-T{ : SSQ10 S\" \a\b\e\f\l\m\q\r\t\v\x0F0\x1Fa\xaBx\z\"\\" ; -> }T
-T{ S\" \a\b\e\f\l\m\q\r\t\v\x0F0\x1Fa\xaBx\z\"\\" SSQ10  S= -> TRUE }T
+T{ : SSQ11 S\" \a\b\e\f\l\m\q\r\t\v\x0F0\x1Fa\xaBx\z\"\\" ; -> }T
+T{ S\" \a\b\e\f\l\m\q\r\t\v\x0F0\x1Fa\xaBx\z\"\\" SSQ11  S= -> TRUE }T
 
 \ ------------------------------------------------------------------------------
 TESTING two buffers available for S" and/or S\" (Forth 2012)
 
-: SSQ11 S" abcd" ;   : SSQ12 S" 1234" ;
-T{ S" abcd"  S" 1234" SSQ12  S= ROT ROT SSQ11 S= -> TRUE TRUE }T
-T{ S\" abcd" S\" 1234" SSQ12 S= ROT ROT SSQ11 S= -> TRUE TRUE }T
-T{ S" abcd"  S\" 1234" SSQ12 S= ROT ROT SSQ11 S= -> TRUE TRUE }T
-T{ S\" abcd" S" 1234" SSQ12  S= ROT ROT SSQ11 S= -> TRUE TRUE }T
+: SSQ12 S" abcd" ;   : SSQ13 S" 1234" ;
+T{ S" abcd"  S" 1234" SSQ13  S= ROT ROT SSQ12 S= -> TRUE TRUE }T
+T{ S\" abcd" S\" 1234" SSQ13 S= ROT ROT SSQ12 S= -> TRUE TRUE }T
+T{ S" abcd"  S\" 1234" SSQ13 S= ROT ROT SSQ12 S= -> TRUE TRUE }T
+T{ S\" abcd" S" 1234" SSQ13  S= ROT ROT SSQ12 S= -> TRUE TRUE }T
 
 
 \ ------------------------------------------------------------------------------
