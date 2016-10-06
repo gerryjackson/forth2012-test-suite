@@ -1,6 +1,20 @@
 Record of changes to the ANS Forth and Forth 2012 test suite
 from version 0.9 onwards
 
+Version 0.13.2
+~~~~~~~~~~~~~~
+filetest.fth
+   - renamed SSQ10, SSQ11, SSQ12 to SSQ11, SSQ12, SSQ13 to avoid redefinition
+     messages
+
+stringtest.fth
+   - renamed BUF to SUBBUF to avoid redefinition message
+
+toolstest.fth
+   - improved NAME>INTERPRET test
+   - in >UPPERCASE replaced ?DO with IF etc as ?DO is Core Extension
+   - renamed first GET-ALL to (GET-ALL) to avoid redefinition message
+
 Version 0.13.1
 ~~~~~~~~~~~~~~
 blocktest.fth
@@ -31,7 +45,7 @@ coreplustest.fth
    - TRUE changed to <TRUE> to use Core definitions
 
 coreexttest.fth
-   - <FALSE> and <TRUE> with FALSE and TRUE to avoid depemdence on Core tests
+   - <FALSE> and <TRUE> with FALSE and TRUE to avoid dependence on Core tests
    - Moved SAVE-INPUT and RESTORE-INPUT tests in a file to filetest.fth
    - Use of 2VARIABLE (in the optional Double number word set) replaced
      with CREATE.
