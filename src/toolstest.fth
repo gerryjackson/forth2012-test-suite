@@ -274,13 +274,17 @@ T{ : SYN3 SYN2 LITERAL ; SYN3 -> 2345 }T
 \ Convert string to upper case and save in the buffer.
 
 \? : >UPPERCASE  ( caddr u  -- caddr2 u2 )
-\?    32 MIN DUP >R UCBUF ROT ROT
-\?    OVER + SWAP
-\?    ?DO
-\?       I C@ DUP [CHAR] a [CHAR] z 1+ WITHIN IF 32 INVERT AND THEN
-\?       OVER C! CHAR+
-\?    LOOP DROP
-\?    UCBUF R>
+\?    32 MIN DUP >R UCBUF DUP 2SWAP
+\?    OVER + SWAP 2DUP U>
+\?    IF
+\?       DO          \ ?DO can't be used, as it is a Core Extension word
+\?          I C@ DUP [CHAR] a [CHAR] z 1+ WITHIN IF 32 INVERT AND THEN
+\?          OVER C! CHAR+
+\?       LOOP
+\?    ELSE
+\?       2DROP
+\?    THEN
+\?    DROP R>
 \? ;
 
 \ Compare string (caddr u) with name associated with nt
@@ -309,14 +313,44 @@ T{ : SYN3 SYN2 LITERAL ; SYN3 -> 2345 }T
 \ difficult to choose a suitable word because:
 \    - a user cannot define one in a standard system
 \    - a Forth system may choose to define interpretation semantics for a word
-\      despite the standard stating they are undefined.
-\ Standard words that are not likely to have interpretation semantics defined
-\ could be: ; EXIT ['] [CHAR] RECURSE
-\ ['] will be used since it has an equivalent in interpretation mode, if that
-\ doesn't work in a given system choose another word for that system.
-\ FORTH-WORDLIST is needed
+\      despite the standard stating they are undefined. If so the behaviour
+\      cannot be tested as it is 'undefined' by the standard.
+\ (October 2016) At least one major system, GForth, has defined behaviour for
+\ all words with undefined interpretation semantics. It is not possible in
+\ standard Forth to define a word without interpretation semantics, therefore
+\ it is not possible to have a general test for NAME>INTERPRET returning 0.
+\ So the following word TIF executes NAME>INTERPRET for all words with
+\ undefined interpretation semantics in the Core word set, the first one to
+\ return 0 causes the rest to be skipped. If none return 0 a message is
+\ displayed to that effect. No system can fail this test!
 
-\? T{ $" [']" FORTH-WORDLIST GET-NAME-TOKEN NAME>INTERPRET -> 0 }T
+\? VARIABLE TIF-SKIP
+\? : TIF  ( "name1 ... namen" -- )  \ TIF = TEST-INTERPRETATION-UNDEFINED
+\?    BEGIN
+\?       TIF-SKIP @ IF SOURCE >IN ! DROP EXIT THEN
+\?       BL WORD COUNT DUP 0= IF 2DROP EXIT THEN  \ End of line
+\?       FORTH-WORDLIST GET-NAME-TOKEN ?DUP ( -- nt nt | 0 0 )
+\?       IF
+\?          NAME>INTERPRET 0= TIF-SKIP ! \ Returning 0 skips further tests
+\?       THEN
+\?       0      \ AGAIN is a Core Ext word
+\?    UNTIL
+\? ;
+
+\? : TIF?  ( -- )
+\?    TIF-SKIP @ 0=
+\?    IF
+\?       CR ." NAME>INTERPRET returns an execution token for all" CR
+\?       ." core words with undefined interpretation semantics." CR
+\?       ." So NAME>INTERPRET returning 0 is untested." CR
+\?    THEN
+\? ;
+
+\? 0 TIF-SKIP !
+\? TIF DUP SWAP DROP
+\? TIF >R R> R@ ." ; EXIT ['] [CHAR] RECURSE ABORT" DOES> LITERAL POSTPONE
+\? TIF DO I J LOOP +LOOP UNLOOP LEAVE IF ELSE THEN BEGIN WHILE REPEAT UNTIL
+\? TIF? 
 
 \ Test NAME>COMPILE
 \? : N>C  ( caddr u -- )  TRAV-WL GET-NAME-TOKEN NAME>COMPILE EXECUTE ; IMMEDIATE
@@ -329,13 +363,13 @@ T{ : SYN3 SYN2 LITERAL ; SYN3 -> 2345 }T
 \? : TRAV3 33 ; : TRAV3 333 ; : TRAV7 7 ; : TRAV3 3333 ;
 \? CURR-WL SET-CURRENT
 
-\? : GET-ALL  ( caddr u nt -- [n] caddr u true )
+\? : (GET-ALL)  ( caddr u nt -- [n] caddr u true )
 \?    DUP >R NAME? IF R@ NAME>INTERPRET EXECUTE ROT ROT THEN
 \?    R> DROP TRUE
 \? ; 
 
 \? : GET-ALL  ( caddr u -- i*x )
-\?    ['] GET-ALL TRAV-WL TRAVERSE-WORDLIST 2DROP
+\?    ['] (GET-ALL) TRAV-WL TRAVERSE-WORDLIST 2DROP
 \? ;
 
 \? T{ $" TRAV3" GET-ALL -> 3333 333 33 3 }T
