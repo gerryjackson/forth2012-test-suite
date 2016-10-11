@@ -1,6 +1,15 @@
 Record of changes to the ANS Forth and Forth 2012 test suite
 from version 0.9 onwards
 
+Version 0.13.3
+~~~~~~~~~~~~~~
+coreplustest.fth
+   - added test for IF ... BEGIN ... REPEAT
+   - additional DOES> test
+
+errorreport.fth
+   - TOTAL-ERRORS now includes Core word errors (bug fix)  
+
 Version 0.13.2
 ~~~~~~~~~~~~~~
 filetest.fth
