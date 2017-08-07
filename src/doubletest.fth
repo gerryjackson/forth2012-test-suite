@@ -225,6 +225,10 @@ T{ -1.  1. D< -> TRUE  }T
 T{ -1.  0. D< -> TRUE  }T
 T{ -2. -1. D< -> TRUE  }T
 T{ -1. -2. D< -> FALSE }T
+T{ 0 1   1. D< -> FALSE }T  \ Suggested by Helmut Eller
+T{ 1.  0 1  D< -> TRUE  }T
+T{ 0 -1 1 -2 D< -> FALSE }T
+T{ 1 -2 0 -1 D< -> TRUE  }T
 T{ -1. MAX-2INT D< -> TRUE }T
 T{ MIN-2INT MAX-2INT D< -> TRUE }T
 T{ MAX-2INT -1. D< -> FALSE }T
@@ -404,6 +408,10 @@ T{  1.  1. DU< -> FALSE }T
 T{  1. -1. DU< -> TRUE  }T
 T{ -1.  1. DU< -> FALSE }T
 T{ -1. -2. DU< -> FALSE }T
+T{ 0 1   1. DU< -> FALSE }T
+T{ 1.  0 1  DU< -> TRUE  }T
+T{ 0 -1 1 -2 DU< -> FALSE }T
+T{ 1 -2 0 -1 DU< -> TRUE  }T
 
 T{ MAX-2INT HI-2INT  DU< -> FALSE }T
 T{ HI-2INT  MAX-2INT DU< -> TRUE  }T
