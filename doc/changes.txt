@@ -3,9 +3,16 @@ from version 0.9 onwards
 
 Version 0.13.3
 ~~~~~~~~~~~~~~
+doubletest.fth
+   - additional tests for D< and DU< to detect faulty implementation
+
+filetest.fth
+   -  Testing READ-LINE with buffer length = 0 and <= the line length in the file.
+
 coreplustest.fth
    - added test for IF ... BEGIN ... REPEAT
    - additional DOES> test
+   - additional +LOOP tests about setting I to arbitrary values
 
 errorreport.fth
    - TOTAL-ERRORS now includes Core word errors (bug fix)  
