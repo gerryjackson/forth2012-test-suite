@@ -137,6 +137,41 @@ T{ 0 MIN-INT 1+   1 MIN-INT GD8  -> 2 }T
 T{ 0 MIN-INT 1+ DUP MIN-INT GD8  -> 1 }T
 
 \ ------------------------------------------------------------------------------
+\ TESTING +LOOP setting I to an arbitrary value
+
+\ The specification for +LOOP permits the loop index I to be set to any value
+\ including a value outside the range given to the corresponding  DO.
+
+\ SET-I is a helper to set I in a DO ... +LOOP to a given value
+\ n2 is the value of I in a DO ... +LOOP
+\ n3 is a test value
+\ If n2=n3 then return n1-n2 else return 1
+: SET-I  ( n1 n2 n3 -- n1-n2 | 1 ) 
+   OVER = IF - ELSE 2DROP 1 THEN
+;
+
+: -SET-I ( n1 n2 n3 -- n1-n2 | -1 )
+   SET-I DUP 1 = IF NEGATE THEN
+;
+
+: PL1 20 1 DO I 18 I 3 SET-I +LOOP ;
+T{ PL1 -> 1 2 3 18 19 }T
+: PL2 20 1 DO I 20 I 2 SET-I +LOOP ;
+T{ PL2 -> 1 2 }T
+: PL3 20 5 DO I 19 I 2 SET-I DUP 1 = IF DROP 0 I 6 SET-I THEN +LOOP ;
+T{ PL3 -> 5 6 0 1 2 19 }T
+: PL4 20 1 DO I MAX-INT I 4 SET-I +LOOP ;
+T{ PL4 -> 1 2 3 4 }T
+: PL5 -20 -1 DO I -19 I -3 -SET-I +LOOP ;
+T{ PL5 -> -1 -2 -3 -19 -20 }T
+: PL6 -20 -1 DO I -21 I -4 -SET-I +LOOP ;
+T{ PL6 -> -1 -2 -3 -4 }T
+: PL7 -20 -1 DO I MIN-INT I -5 -SET-I +LOOP ;
+T{ PL7 -> -1 -2 -3 -4 -5 }T
+: PL8 -20 -5 DO I -20 I -2 -SET-I DUP -1 = IF DROP 0 I -6 -SET-I THEN +LOOP ;
+T{ PL8 -> -5 -6 0 -1 -2 -20 }T
+
+\ ------------------------------------------------------------------------------
 TESTING multiple RECURSEs in one colon definition
 
 : ACK ( m n -- u )    \ Ackermann function, from Rosetta Code
