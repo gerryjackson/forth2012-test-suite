@@ -6,7 +6,10 @@ Version 0.13.4
 core.fr
    - test ALIGN and ALIGNED before , (comma) so that dataspace can be aligned
      before it is tested (see issue #18)
-
+coreplustest.fth
+   - tests ALLOT with n <= 0
+   - Items tested list updated
+   - Version history removed
 prelimtest.fth
    - CONSTANT now tested
 
