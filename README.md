@@ -40,9 +40,11 @@ The tests are not comprehensive, no claim is made about their being correct and 
 
 (Note that the above assumes the system can include source files via the word INCLUDED. If that is not the case then another way of streaming input from the file will have to be found.)
 
-There is a flag, called VERBOSE, in file tester.fr that can be set to obtain more output from the test programs. When a test fails an error message is displayed and the tests carry on. To stop on the first failure uncomment the line marked *** in tester.fr 
+There is a flag, called VERBOSE, in file tester.fr that can be set to obtain more output from the test programs.
 
-Typical output from the tests is given in the file doc/testoutput.txt. Some tests, particularly those dsisplaying text cannot be automatically checked and require visual inspection.
+When a test fails an error message is displayed and the tests carry on. To stop on the first failure uncomment the line marked *** in tester.fr 
+
+Typical output from the tests is given in the file doc/testoutput.txt. Some tests, particularly those displaying text cannot be automatically checked and require visual inspection.
 
 **Error Messages**
  There are two possible error messages when a test fails:
