@@ -4,7 +4,7 @@
 \ Select the appropriate test harness, either the simple tester.fr
 \ or the more complex ttester.fs 
 
-CR .( Running ANS Forth and Forth 2012 test programs, version 0.13.3) CR
+CR .( Running ANS Forth and Forth 2012 test programs, version 0.13.4) CR
 
 S" prelimtest.fth" INCLUDED
 S" tester.fr" INCLUDED
