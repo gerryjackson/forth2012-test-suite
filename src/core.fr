@@ -553,6 +553,12 @@ T{ 1STA 2NDA U< -> <TRUE> }T      \ HERE MUST GROW WITH ALLOT
 T{ 1STA 1+ -> 2NDA }T         \ ... BY ONE ADDRESS UNIT
 ( MISSING TEST: NEGATIVE ALLOT )
 
+\ Added by GWJ so that ALIGN can be used before , (comma) is tested
+1 ALIGNED CONSTANT ALMNT   \ -- 1|2|4|8 for 8|16|32|64 bit alignment
+ALIGN
+T{ HERE 1 ALLOT ALIGN HERE SWAP - ALMNT = -> <TRUE> }T
+\ End of extra test
+
 HERE 1 ,
 HERE 2 ,
 CONSTANT 2ND
