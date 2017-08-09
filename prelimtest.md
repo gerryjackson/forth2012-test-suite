@@ -39,7 +39,7 @@ To avoid tests being typed in it helps if `INCLUDED` works so that a file can be
 2. Tests on standard words will be rudimentary rather than exhaustive, just testing the basic operation.
 2. Two's complement arithmetic is assumed.
 
-## Restrictions on the tester##
+## Restrictions on the tester ##
 
 1. Only words from the Core word set and will be used in the tester, any others will have to be defined unless already defined - this particularly applies to the four Core Extension words used in the Hayes tester. This restriction unfortunately rules out the use of `\` `.(` `PARSE` and a few other useful words.
 2. Only absolutely necessary words will be defined.
