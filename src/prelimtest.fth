@@ -167,34 +167,40 @@ TST8 65 = ?~ Error #47: testing [CHAR]
 TST9 .MSG(  #22: testing EMIT) CR
 : TST10  ( -- )  S" Pass #23: testing S" TYPE [CHAR] " EMIT CR ; TST10
 
+~ The Hayes core test core.fr uses CONSTANT before it is tested therefore
+~ we test CONSTANT here
+
+1234 CONSTANT CTEST
+CTEST 1234 = ?~ Error #48: testing CONSTANT
+
 ~ The Hayes tester uses some words from the Core extension word set
 ~ These will be conditionally defined following definition of a
 ~ word called ?DEFINED to determine whether these are already defined
 
 VARIABLE TIMM1 0 TIMM1 !
 : TIMM2  123 TIMM1 ! ; IMMEDIATE
-: TIMM3 TIMM2 ; TIMM1 @ 123 = ?~ Error #48: testing IMMEDIATE
+: TIMM3 TIMM2 ; TIMM1 @ 123 = ?~ Error #49: testing IMMEDIATE
 
 : ?DEFINED  ( "name" -- 0 | -1 )  32 WORD FIND SWAP DROP 0= 0= ;
-?DEFINED SWAP ?~ Error #49: testing FIND ?DEFINED
-?DEFINED <<no-such-word-hopefully>> 0= ?~ Error #50 testing FIND ?DEFINED
+?DEFINED SWAP ?~ Error #50: testing FIND ?DEFINED
+?DEFINED <<no-such-word-hopefully>> 0= ?~ Error #51 testing FIND ?DEFINED
 
 ?DEFINED \ ?~ : \ ~ ; IMMEDIATE 
-\ Error #51: testing \
-: TIMM4  \ Error #52: testing \ is IMMEDIATE
+\ Error #52: testing \
+: TIMM4  \ Error #53: testing \ is IMMEDIATE
 ;
 
-~ TRUE and FALSE are defined as colon definitions to avoid using and
-~ having to test CONSTANT
+~ TRUE and FALSE are defined as colon definitions as they have been used
+~ more than CONSTANT above
 
 ?DEFINED TRUE  ?~ : TRUE 1 NEGATE ;
 ?DEFINED FALSE ?~ : FALSE 0 ;
 ?DEFINED HEX   ?~ : HEX 16 BASE ! ;
 
-TRUE -1 = ?~ Error #53: testing TRUE
-FALSE 0=  ?~ Error #54: testing FALSE
-10 HEX 0A = ?~ Error #55: testing HEX
-AB 0A BASE ! 171 = ?~ Error #56: testing hex number
+TRUE -1 = ?~ Error #54: testing TRUE
+FALSE 0=  ?~ Error #55: testing FALSE
+10 HEX 0A = ?~ Error #56: testing HEX
+AB 0A BASE ! 171 = ?~ Error #57: testing hex number
 
 ~ Delete the ~ on the next 2 lines to check the final error report
 ~ Error #998: testing a deliberate failure
@@ -222,6 +228,6 @@ DUP NEGATE 9 + 0< NEGATE >IN +! ( -10 + SWAP 1+ SWAP 0 >IN ! )
 SWAP ?DUP 0= 1+ >IN +! ( 48 + EMIT ( ) 48 + EMIT
 
 .MSG(  test) #ERRS @ 1 = 1+ >IN +! ~ .MSG( s)
-.MSG(  failed out of 56 additional tests) CR
+.MSG(  failed out of 57 additional tests) CR
 
 CR CR .MSG( --- End of Preliminary Tests --- ) CR
