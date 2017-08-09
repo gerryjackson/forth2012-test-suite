@@ -1,6 +1,15 @@
 Record of changes to the ANS Forth and Forth 2012 test suite
 from version 0.9 onwards
 
+Version 0.13.4
+~~~~~~~~~~~~~~
+core.fr
+   - test ALIGN and ALIGNED before , (comma) so that dataspace can be aligned
+     before it is tested (see issue #18)
+
+prelimtest.fth
+   - CONSTANT now tested
+
 Version 0.13.3
 ~~~~~~~~~~~~~~
 doubletest.fth
