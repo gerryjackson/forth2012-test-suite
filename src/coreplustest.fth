@@ -11,30 +11,17 @@
 \ The tests are not claimed to be comprehensive or correct 
 
 \ ------------------------------------------------------------------------------
-\ Version 0.13 TRUE changed to <TRUE> as defined in core.fr
-\         0.12 22 July 2015, >IN Manipulation test modified to work on 16 bit
-\              Forth systems
-\         0.11 25 April 2015 Number prefixes # $ % and 'c' character input tested
-\         0.10 3 August 2014 Test IMMEDIATE doesn't toggle an immediate flag
-\         0.3  1 April 2012 Tests placed in the public domain.
-\              Testing multiple ELSE's.
-\              Further tests on DO +LOOPs.
-\              Ackermann function added to test RECURSE.
-\              >IN manipulation in interpreter mode
-\              Immediate CONSTANTs, VARIABLEs and CREATEd words tests.
-\              :NONAME with RECURSE moved to core extension tests.
-\              Parsing behaviour of S" ." and ( tested
-\         0.2  6 March 2009 { and } replaced with T{ and }T
-\              Added extra RECURSE tests
-\         0.1  20 April 2007 Created
-\ ------------------------------------------------------------------------------
 \ The tests are based on John Hayes test program for the core word set
 \
 \ This file provides some more tests on Core words where the original Hayes
 \ tests are thought to be incomplete
 \
 \ Words tested in this file are:
-\     DO +LOOP RECURSE ELSE >IN IMMEDIATE
+\     DO I +LOOP RECURSE ELSE >IN IMMEDIATE FIND IF...BEGIN...REPEAT ALLOT DOES>
+\ and
+\     Parsing behaviour
+\     Number prefixes # $ % and 'A' character input
+\     Definition names
 \ ------------------------------------------------------------------------------
 \ Assumptions and dependencies:
 \     - tester.fr or ttester.fs has been loaded prior to this file
@@ -307,6 +294,12 @@ TESTING DOES> doesn't cause a problem with a CREATEd address
 : MAKE-2CONST DOES> 2@ ;
 T{ CREATE 2K 3 , 2K , MAKE-2CONST 2K -> ' 2K >BODY 3 }T
 
+\ ------------------------------------------------------------------------------
+TESTING ALLOT ( n -- ) where n <= 0
+
+T{ HERE 5 ALLOT -5 ALLOT HERE = -> <TRUE> }T
+T{ HERE 0 ALLOT HERE = -> <TRUE> }T
+ 
 \ ------------------------------------------------------------------------------
 
 CR .( End of additional Core tests) CR
