@@ -7,7 +7,7 @@ SOURCE ( These lines test SOURCE, TYPE, CR and parenthetic comments ) TYPE CR
 ( defined to report errors. Until then reporting failures will depend on the )
 ( system under test and will usually be via reporting an unrecognised word   )
 ( or possibly the system crashing. Tests will be numbered by #n from now on  )
-( to assist fault finding. Test failures successes will be indicated by      )
+( to assist fault finding. Test successes will be indicated by               )
 ( 'Pass: #n ...' and failures by 'Error: #n ...'                             )
 
 ( Initial tests of >IN +! and 1+ )
@@ -41,7 +41,7 @@ SOURCE ( These lines test SOURCE, TYPE, CR and parenthetic comments ) TYPE CR
 ( Pass #8: testing VARIABLE ) VARIABLE Y 2 Y ! Y @ >IN +! xx.SRC
 
 : MSG 41 WORD COUNT ;  ( 41 is the ASCII code for right parenthesis )
-( The next tests MSG leaves 2 itmes on the data stack )
+( The next tests MSG leaves 2 items on the data stack )
 ( Pass #9: testing WORD COUNT ) 5 MSG abcdef) Y ! Y ! >IN +! xxxxx.SRC
 ( Pass #10: testing WORD COUNT ) MSG ab) >IN +! xxY ! .SRC
 
