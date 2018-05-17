@@ -237,54 +237,77 @@ T{ $" abc%mac3%d" SUBBUF 10 SUBSTITUTE ROT ROT 2DROP 0< -> TRUE }T
 \ Conditional test for overlapping strings, including the case where
 \ caddr1 = caddr2. If a system cannot handle overlapping strings it should
 \ return n < 0 with (caddr2 u2) undefined. If it can handle them correctly
-\ it should return the usual results for success. The following definition
-\ applies the appropriate tests depending on whether n < 0 or not.
-\ Return ( f n ) where f = TRUE if:
-\   n >= 0 and (bufad = caddr1)
-\          and (string1 = string2)
-\   or n < 0
+\ it should return the usual results for success. The following definitions
+\ apply the appropriate tests depending on whether n < 0 or not.
+\ The overlapping SUBSTITUTE tests:
+\     succeed if SUBSTITUTE returns an error i.e. n<0
+\     fail if n is incorrect 
+\     fail if the result string is at the incorrect addresses
+\     fail if the result string is incorrect
+\ Note that variables are used to avoid complicated stack manipulations
 
-: SUBST-N?  ( n1 n2 -- f )  \ True if n1<0 or n1>=0 and n1=n2 )
-   OVER 0< IF DROP 0< 0= ELSE = THEN
+VARIABLE sdest       \ Holds dest address for SUBSTITUTE
+20 constant ssize
+2VARIABLE $sresult   VARIABLE #subst   \ Hold output from SUBSTITUTE
+
+\ sinit set ups addresses and inputs for SUBSTITUTE and saves the
+\ output destination for check-subst
+\     srcn and destn are offsets into the substitution buffer subbuf
+\     (caddr1 u1) is the input string for SUBSTITUTE
+
+: sinit  ( caddr1 u1 srcn destn -- src u1 dest size )
+   CHARS subbuf + sdest !        ( -- caddr1 u1 srcn )
+   CHARS subbuf + 2DUP 2>R       ( -- caddr1 u1 src ) ( R: -- u1 src )
+   SWAP CHARS MOVE               ( -- )
+   R> R> sdest @ ssize           ( -- src u1 dest size) ( R: -- )
 ;
 
-\ Check the result of overlapped-subst
-\ n2 is expected number of substitutions, caddr2 u2 the expected result
-: CHECK-SUBST  ( caddr1 u1 bufad n n2 caddr2 u2 -- f )
-   >R >R ROT >R SUBST-N?         ( -- caddr1 u1 f1 )
-   IF
-      OVER R> =                  \ Check caddr1 = bufad
-      IF
-         R> R> COMPARE 0= EXIT   \ Check string1 = string2
-      THEN
-   ELSE
-      R> DROP
-   THEN
-   R> R> 2DROP 2DROP FALSE
+\ In check-subst
+\     (caddr1 u1) is the expected result from SUBSTITUTE
+\     n is the expected n if SUBSTITUTE succeeded with overlapping buffers
+
+: check-subst  ( caddr1 u1 n -- f )
+   #subst @ 0<
+   IF DROP 2DROP TRUE EXIT THEN  \ SUBSTITUTE failed, test succeeds
+   #subst @ = >R
+   $sresult CELL+ @ sdest @ = R> AND
+   IF $sresult 2@ COMPARE 0= EXIT THEN
+   2DROP FALSE                   \ Fails if #subst or result address is wrong
 ;
 
-\ Copy string to (buf+u2) and expect substitution result at (buf+u3)
-\ u4 is length of result buffer
-\ then execute SUBSTITUTE and check the result
+\ Testing the helpers sinit and check-subst
 
-: OVERLAPPED-SUBST  ( caddr1 u1 u2 u3 u4 -- caddr5 u5 bufad n )
-   >R >R                            ( -- caddr1 u1 u2 )  ( R: -- u4 u3 )
-   CHARS SUBBUF + SWAP                 ( -- caddr1 buf+u2' u1 )
-   DUP >R OVER >R MOVE              ( -- )  ( R: -- u4 u3 u1 buf+u2') 
-   R> R> SUBBUF R> CHARS + R>          ( -- buf+u2 u1 buf+u3' u4 )
-   OVER >R SUBSTITUTE R> SWAP       ( -- caddr5 u5 buf+u3 n )
+T{ $" abcde" 2 6 sinit -> subbuf 2 chars + 5 subbuf 6 chars + ssize }T
+T{ $" abcde" subbuf 2 chars + over compare -> 0 }T
+T{ sdest @ -> subbuf 6 chars + }T
+
+T{ -78 #subst ! 0 0 0 check-subst -> TRUE }T
+T{ 5 #subst ! $" def" over sdest ! 2dup $sresult 2! 5 check-subst -> TRUE }T
+T{ 5 #subst ! $" def" over sdest ! 2dup $sresult 2! 4 check-subst -> FALSE }T
+T{ 5 #subst ! $" def" over sdest ! 2dup 1+ $sresult 2! 5 check-subst -> FALSE }T
+T{ 5 #subst ! $" def" over sdest ! 2dup 1- $sresult 2! 3 check-subst -> FALSE }T
+
+\ Testing overlapping SUBSTITUTE
+
+: do-subst  ( caddr1 u1 n1 n2 -- )
+   sinit SUBSTITUTE #subst ! $sresult 2!
 ;
 
 T{ $" zyxwvut" MAC3 REPLACES -> }T
 T{ $" zyx"     MAC2 REPLACES -> }T
-T{ $" a%mac3%b" 0 9 20 OVERLAPPED-SUBST 1 $" azyxwvutb" CHECK-SUBST -> TRUE }T
-T{ $" a%mac3%b" 0 3 20 OVERLAPPED-SUBST 1 $" azyxwvutb" CHECK-SUBST -> TRUE }T
-T{ $" a%mac2%b" 0 3 20 OVERLAPPED-SUBST 1 $" azyxb"     CHECK-SUBST -> TRUE }T
-T{ $" abcdefgh" 0 0 20 OVERLAPPED-SUBST 0 $" abcdefgh"  CHECK-SUBST -> TRUE }T
-T{ $" a%mac3%b" 3 0 20 OVERLAPPED-SUBST 1 $" azyxwvutb" CHECK-SUBST -> TRUE }T
-T{ $" a%mac3%b" 9 0 20 OVERLAPPED-SUBST 1 $" azyxwvutb" CHECK-SUBST -> TRUE }T
 
-\ Definition using a name on the stack
+T{ $" a%mac3%b" 0 9 do-subst $" azyxwvutb" 1 check-subst -> TRUE }T
+T{ $" c%mac3%d" 0 3 do-subst $" czyxwvutd" 1 check-subst -> TRUE }T
+T{ $" e%mac2%f" 0 3 do-subst $" ezyxf"     1 check-subst -> TRUE }T
+T{ $" abcdefgh" 0 0 do-subst $" abcdefgh"  0 check-subst -> TRUE }T
+T{ $" i%mac3%j" 3 0 do-subst $" izyxwvutj" 1 check-subst -> TRUE }T
+T{ $" k%mac3%l" 9 0 do-subst $" kzyxwvutl" 1 check-subst -> TRUE }T
+
+\ Simulating a failing overlapping SUBSTITUTE
+
+T{ $" pqrst" 2dup 0 0 do-subst -78 #subst ! 0 check-subst -> TRUE }T
+
+\ Using SUBSTITUTE to define a name whose (caddr u) is on the stack
 : $CREATE  ( caddr u -- )
    S" name" REPLACES          ( -- )
    S" CREATE %name%" SUBBUF 40 SUBSTITUTE
