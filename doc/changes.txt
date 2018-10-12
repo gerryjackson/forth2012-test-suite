@@ -1,6 +1,8 @@
 Record of changes to the ANS Forth and Forth 2012 test suite
 from version 0.9 onwards
 
+12/10/2018 doubletest.fth Fixed overflow bug in M*/ test 
+
 Version 0.13.4
 ~~~~~~~~~~~~~~
 core.fr
