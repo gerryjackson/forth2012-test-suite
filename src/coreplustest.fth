@@ -305,6 +305,7 @@ TESTING LEAVE in outer loop leaves to the outer LOOP
 \ Contributed by Johan Kotlinski
 
 T{ : GD10 1 0 DO LEAVE 1 0 DO LOOP 1 LOOP ; -> }T
+T{ : GD10 1 0 DO LEAVE 1 0 DO +LOOP 1 +LOOP ; -> }T
 T{ GD10 -> }T
 
 \ ------------------------------------------------------------------------------
