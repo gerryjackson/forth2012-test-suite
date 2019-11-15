@@ -735,6 +735,9 @@ T{ 1 GD6 -> 1 }T
 T{ 2 GD6 -> 3 }T
 T{ 3 GD6 -> 4 1 2 }T
 
+T{ : GD7 1 0 DO LEAVE 1 0 DO LOOP 1 LOOP ; -> }T
+T{ GD7 -> }T
+
 \ ------------------------------------------------------------------------
 TESTING DEFINING WORDS: : ; CONSTANT VARIABLE CREATE DOES> >BODY
 
