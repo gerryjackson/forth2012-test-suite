@@ -750,16 +750,16 @@ T{ SSQ3 DROP 19 CHARS + C@ ->  92 }T    \ \\   \    Back Slash
 CR .( The next test should display:)
 CR .( One line...)
 CR .( another line)
-T{ : SSQ4 S\" \nOne line...\nanotherLine\n" type ; SSQ4 -> }T
+T{ : SSQ4 S\" \nOne line...\nanotherLine\n" TYPE ; SSQ4 -> }T
 
 \ Test bare escapable characters appear as themselves
 T{ : SSQ5 S\" abeflmnqrtvxz" S" abeflmnqrtvxz" S= ; SSQ5 -> TRUE }T
 
 T{ : SSQ6 S\" a\""2DROP 1111 ; SSQ6 -> 1111 }T \ Parsing behaviour
 
-T{ : SSQ7  S\" 111 : SSQ8 s\\\" 222\" EVALUATE ; SSQ8 333" EVALUATE ; -> }T
+T{ : SSQ7  S\" 111 : SSQ8 S\\\" 222\" EVALUATE ; SSQ8 333" EVALUATE ; -> }T
 T{ SSQ7 -> 111 222 333 }T
-T{ : SSQ9  S\" 11 : SSQ10 s\\\" \\x32\\x32\" EVALUATE ; SSQ10 33" EVALUATE ; -> }T
+T{ : SSQ9  S\" 11 : SSQ10 S\\\" \\x32\\x32\" EVALUATE ; SSQ10 33" EVALUATE ; -> }T
 T{ SSQ9 -> 11 22 33 }T
 
 \ -----------------------------------------------------------------------------
