@@ -12,6 +12,9 @@ coreplustest.fth
    - tests ALLOT with n <= 0
    - Items tested list updated
    - Version history removed
+coreexttest.fth
+   - type changed to TYPE in definition SSQ4 (issue #26)
+   - s\\\" changed to S\\\" in definitions SSQ7 and SSQ9 (issue #26)
 prelimtest.fth
    - CONSTANT now tested
 
