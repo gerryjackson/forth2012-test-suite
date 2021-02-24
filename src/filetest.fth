@@ -103,7 +103,7 @@ TESTING R/W WRITE-FILE REPOSITION-FILE READ-FILE FILE-POSITION S"
 
 : LINE2 S" Line 2 blah blah blah" ;
 : RL1  BUF 100 FID1 @ READ-LINE  ;
-2VARIABLE FP
+CREATE FP 0 , 0 ,    \ Don't use 2VARIABLE
 : DEQ  ( d -- f )  ROT = >R = R> AND  ;  \ Same as D= in Double Number word set
 
 T{ FN1 R/W OPEN-FILE SWAP FID1 ! -> 0 }T
