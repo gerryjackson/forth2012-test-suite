@@ -1,8 +1,19 @@
 Record of changes to the ANS Forth and Forth 2012 test suite
 from version 0.9 onwards
 
-12/10/2018 doubletest.fth Fixed overflow bug in M*/ test 
-
+Version 0.13.5
+~~~~~~~~~~~~~~
+coreexttest.fth
+   - case sensitivity issue fixed
+doubletest.fth
+   - Fixed overflow bug in M*/ test 
+filetest.fth
+   - Removed dependency on D= in the Double Number word set
+   - Replaced double numbers e.g. 500. with 500 0
+   - Deleted Version History it duplicate information in this file 
+stringtest.fth
+   - Rewrite of SUBSTITUTE tests with overlapping buffers
+   
 Version 0.13.4
 ~~~~~~~~~~~~~~
 core.fr
@@ -22,6 +33,7 @@ Version 0.13.3
 ~~~~~~~~~~~~~~
 doubletest.fth
    - additional tests for D< and DU< to detect faulty implementation
+   - Definitions SSQ4, SSQ7 and SSQ9 - converted type and s\" to upper case
 
 filetest.fth
    -  Testing READ-LINE with buffer length = 0 and <= the line length in the file.
