@@ -11,23 +11,6 @@
 \ The tests are not claimed to be comprehensive or correct 
 
 \ ------------------------------------------------------------------------------
-\ Version 0.13 S" in interpretation mode tested.
-\              Added SAVE-INPUT RESTORE-INPUT REFILL in a file, (moved from
-\              coreexttest.fth).
-\              Calls to COMPARE replaced with S= (in utilities.fth) 
-\         0.11 25 April 2015 S\" in interpretation mode test added
-\              REQUIRED REQUIRE INCLUDE tests added
-\              Two S" and/or S\" buffers availability tested
-\         0.5  1 April 2012  Tests placed in the public domain.
-\         0.4  22 March 2009 { and } replaced with T{ and }T
-\         0.3  20 April 2007  ANS Forth words changed to upper case.
-\              Removed directory test from the filenames.
-\         0.2  30 Oct 2006 updated following GForth tests to remove
-\              system dependency on file size, to allow for file
-\              buffering and to allow for PAD moving around.
-\         0.1  Oct 2006 First version released.
-
-\ ------------------------------------------------------------------------------
 \ The tests are based on John Hayes test program for the core word set
 \ and requires those files to have been loaded
 
@@ -84,7 +67,7 @@ CREATE BUF BSIZE ALLOT
 VARIABLE #CHARS
 
 T{ FN1 R/O OPEN-FILE SWAP FID1 ! -> 0 }T
-T{ FID1 @ FILE-POSITION -> 0. 0 }T
+T{ FID1 @ FILE-POSITION -> 0 0 0 }T
 T{ BUF 100 FID1 @ READ-LINE ROT DUP #CHARS ! -> TRUE 0 LINE1 SWAP DROP }T
 T{ BUF #CHARS @ LINE1 S= -> TRUE }T
 T{ FID1 @ CLOSE-FILE -> 0 }T
@@ -92,7 +75,7 @@ T{ FID1 @ CLOSE-FILE -> 0 }T
 \ Additional test contributed by Helmut Eller
 \ Test with buffer shorter than the line including zero length buffer.
 T{ FN1 R/O OPEN-FILE SWAP FID1 ! -> 0 }T
-T{ FID1 @ FILE-POSITION -> 0. 0 }T
+T{ FID1 @ FILE-POSITION -> 0 0 0 }T
 T{ BUF 0 FID1 @ READ-LINE ROT DUP #CHARS ! -> TRUE 0 0 }T
 T{ BUF 3 FID1 @ READ-LINE ROT DUP #CHARS ! -> TRUE 0 3 }T
 T{ BUF #CHARS @ LINE1 DROP 3 S= -> TRUE }T
@@ -103,7 +86,7 @@ T{ FID1 @ CLOSE-FILE -> 0 }T
 \ Additional test contributed by Helmut Eller
 \ Test with buffer exactly as long as the line.
 T{ FN1 R/O OPEN-FILE SWAP FID1 ! -> 0 }T
-T{ FID1 @ FILE-POSITION -> 0. 0 }T
+T{ FID1 @ FILE-POSITION -> 0 0 0 }T
 T{ BUF LINE1 NIP FID1 @ READ-LINE ROT DUP #CHARS ! -> TRUE 0 LINE1 NIP }T
 T{ BUF #CHARS @ LINE1 S= -> TRUE }T
 T{ FID1 @ CLOSE-FILE -> 0 }T
@@ -119,22 +102,23 @@ T{ S" ghi"$" ghi" S= -> TRUE }T
 TESTING R/W WRITE-FILE REPOSITION-FILE READ-FILE FILE-POSITION S"
 
 : LINE2 S" Line 2 blah blah blah" ;
-: RL1 BUF 100 FID1 @ READ-LINE ;
+: RL1  BUF 100 FID1 @ READ-LINE  ;
 2VARIABLE FP
+: DEQ  ( d -- f )  ROT = >R = R> AND  ;  \ Same as D= in Double Number word set
 
 T{ FN1 R/W OPEN-FILE SWAP FID1 ! -> 0 }T
 T{ FID1 @ FILE-SIZE DROP FID1 @ REPOSITION-FILE -> 0 }T
 T{ FID1 @ FILE-SIZE -> FID1 @ FILE-POSITION }T
 T{ LINE2 FID1 @ WRITE-FILE -> 0 }T
-T{ 10. FID1 @ REPOSITION-FILE -> 0 }T
-T{ FID1 @ FILE-POSITION -> 10. 0 }T
-T{ 0. FID1 @ REPOSITION-FILE -> 0 }T
+T{ 10 0 FID1 @ REPOSITION-FILE -> 0 }T
+T{ FID1 @ FILE-POSITION -> 10 0 0 }T
+T{ 0 0 FID1 @ REPOSITION-FILE -> 0 }T
 T{ RL1 -> LINE1 SWAP DROP TRUE 0 }T
 T{ RL1 ROT DUP #CHARS ! -> TRUE 0 LINE2 SWAP DROP }T
 T{ BUF #CHARS @ LINE2 S= -> TRUE }T
 T{ RL1 -> 0 FALSE 0 }T
 T{ FID1 @ FILE-POSITION ROT ROT FP 2! -> 0 }T
-T{ FP 2@ FID1 @ FILE-SIZE DROP D= -> TRUE }T
+T{ FP 2@ FID1 @ FILE-SIZE DROP DEQ -> TRUE }T
 T{ S" " FID1 @ WRITE-LINE -> 0 }T
 T{ S" " FID1 @ WRITE-LINE -> 0 }T
 T{ FP 2@ FID1 @ REPOSITION-FILE -> 0 }T
@@ -156,14 +140,14 @@ SETPAD   \ If anything else is defined setpad must be called again
 
 T{ FN2 R/W BIN CREATE-FILE SWAP FID2 ! -> 0 }T
 T{ PAD 50 FID2 @ WRITE-FILE FID2 @ FLUSH-FILE -> 0 0 }T
-T{ FID2 @ FILE-SIZE -> 50. 0 }T
-T{ 0. FID2 @ REPOSITION-FILE -> 0 }T
+T{ FID2 @ FILE-SIZE -> 50 0 0 }T
+T{ 0 0 FID2 @ REPOSITION-FILE -> 0 }T
 T{ CBUF BUF 29 FID2 @ READ-FILE -> 29 0 }T
 T{ PAD 29 BUF 29 S= -> TRUE }T
 T{ PAD 30 BUF 30 S= -> FALSE }T
 T{ CBUF BUF 29 FID2 @ READ-FILE -> 21 0 }T
 T{ PAD 29 + 21 BUF 21 S= -> TRUE }T
-T{ FID2 @ FILE-SIZE DROP FID2 @ FILE-POSITION DROP D= -> TRUE }T
+T{ FID2 @ FILE-SIZE DROP FID2 @ FILE-POSITION DROP DEQ -> TRUE }T
 T{ BUF 10 FID2 @ READ-FILE -> 0 0 }T
 T{ FID2 @ CLOSE-FILE -> 0 }T
 
@@ -171,15 +155,15 @@ T{ FID2 @ CLOSE-FILE -> 0 }T
 TESTING RESIZE-FILE
 
 T{ FN2 R/W BIN OPEN-FILE SWAP FID2 ! -> 0 }T
-T{ 37. FID2 @ RESIZE-FILE -> 0 }T
-T{ FID2 @ FILE-SIZE -> 37. 0 }T
-T{ 0. FID2 @ REPOSITION-FILE -> 0 }T
+T{ 37 0 FID2 @ RESIZE-FILE -> 0 }T
+T{ FID2 @ FILE-SIZE -> 37 0 0 }T
+T{ 0 0 FID2 @ REPOSITION-FILE -> 0 }T
 T{ CBUF BUF 100 FID2 @ READ-FILE -> 37 0 }T
 T{ PAD 37 BUF 37 S= -> TRUE }T
 T{ PAD 38 BUF 38 S= -> FALSE }T
-T{ 500. FID2 @ RESIZE-FILE -> 0 }T
-T{ FID2 @ FILE-SIZE -> 500. 0 }T
-T{ 0. FID2 @ REPOSITION-FILE -> 0 }T
+T{ 500 0 FID2 @ RESIZE-FILE -> 0 }T
+T{ FID2 @ FILE-SIZE -> 500 0 0 }T
+T{ 0 0 FID2 @ REPOSITION-FILE -> 0 }T
 T{ CBUF BUF 100 FID2 @ READ-FILE -> 100 0 }T
 T{ PAD 37 BUF 37 S= -> TRUE }T
 T{ FID2 @ CLOSE-FILE -> 0 }T
