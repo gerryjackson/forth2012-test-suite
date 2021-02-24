@@ -8,7 +8,7 @@ coreexttest.fth
 doubletest.fth
    - Fixed overflow bug in M*/ test 
 filetest.fth
-   - Removed dependency on D= in the Double Number word set
+   - Removed dependency on D= and 2VARIABLE in the Double Number word set
    - Replaced double numbers e.g. 500. with 500 0
    - Deleted Version History it duplicate information in this file 
 stringtest.fth
