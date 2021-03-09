@@ -17,7 +17,7 @@
 \ tests are thought to be incomplete
 \
 \ Words tested in this file are:
-\     DO I +LOOP RECURSE ELSE >IN IMMEDIATE FIND IF...BEGIN...REPEAT ALLOT DOES>
+\     DO I +LOOP RECURSE ELSE >IN IMMEDIATE FIND IF...BEGIN...REPEAT ALLOT DOES> LEAVE
 \ and
 \     Parsing behaviour
 \     Number prefixes # $ % and 'A' character input
@@ -300,6 +300,15 @@ TESTING ALLOT ( n -- ) where n <= 0
 T{ HERE 5 ALLOT -5 ALLOT HERE = -> <TRUE> }T
 T{ HERE 0 ALLOT HERE = -> <TRUE> }T
  
+\ ------------------------------------------------------------------------------
+TESTING LEAVE in outer loop leaves to the outer LOOP
+\ Contributed by Johan Kotlinski
+
+T{ : GD10 1 0 DO LEAVE 1 0 DO LOOP 1 LOOP ; -> }T
+T{ GD10 -> }T
+T{ : GD11 1 0 DO LEAVE 1 0 DO +LOOP 1 +LOOP ; -> }T
+T{ GD11 -> }T
+
 \ ------------------------------------------------------------------------------
 
 CR .( End of additional Core tests) CR
