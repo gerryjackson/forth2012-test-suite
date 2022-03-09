@@ -53,7 +53,20 @@ Typical output from the tests is given in the file doc/testoutput.txt. Some test
 
 These are followed by the offending line of source code. 
 
-Other failures such as a standard word not being recognised will likely result in the test run terminating.
+Other failures such as a standard word not being recognised will likely result in the test run terminating. This is the case if you are using
+GForth 0.7.3 to run the tests when a message such as:
+```
+coreexttest.fth:400: Undefined word
+T{ 8 >>>BUFFER:<<< BUF:TEST -> }T
+etc
+```
+and the tests will terminate.
+
+This is because BUFFER: is a Forth 2012 addition to ANS Forth (1994) and is not included in GForth 0.7.3 which
+was released in 2008. The same is true for all additional words in Forth 2012.
+
+To overcome this please use a recent snapshot executable or compile and build Gforth yourself from:
+[GForth 0.7.9](https://www.complang.tuwien.ac.at/forth/gforth/Snapshots/)
 
 **Floating Point Tests**
 Some floating point test programs from various sources have been collected together and made available in this download. For more details see the file fp/readme-fp.txt in the download. These tests are unproven and provided in the hope that implementers of ANS Forth/Forth 200X systems will try them and report back on any perceived deficiencies which can then be resolved. When they are generally agreed to be correct they can be incorporated into the above set of test programs. (This would seem to be extremely optimistic as only one communication has been received in nearly four years!)
