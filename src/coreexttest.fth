@@ -11,7 +11,9 @@
 \ The tests are not claimed to be comprehensive or correct 
 
 \ ------------------------------------------------------------------------------
-\ Version 0.13 28 October 2015
+\ Version 0.14 21 July 2022 Updated first line of BUFFER: test as recommended
+\              in issue 32
+\         0.13 28 October 2015
 \              Replace <FALSE> and <TRUE> with FALSE and TRUE to avoid
 \              dependence on Core tests
 \              Moved SAVE-INPUT and RESTORE-INPUT tests in a file to filetest.fth
@@ -397,7 +399,7 @@ T{  2 -1  1 QD6 -> -1 0 1 3 }T
 \ -----------------------------------------------------------------------------
 TESTING BUFFER:
 
-T{ 8 BUFFER: BUF:TEST -> }T
+T{ 2 CELLS BUFFER: BUF:TEST -> }T
 T{ BUF:TEST DUP ALIGNED = -> TRUE }T
 T{ 111 BUF:TEST ! 222 BUF:TEST CELL+ ! -> }T
 T{ BUF:TEST @ BUF:TEST CELL+ @ -> 111 222 }T
