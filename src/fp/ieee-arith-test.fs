@@ -312,8 +312,6 @@ t{ -1e  fsqrt fnan? -> true }t
 verbose @ [IF] .( NOT TESTING -1E FSQRT) cr [THEN]
 [THEN]
 
-.( NOT TESTING F*+) cr
-
 ?.errors ?.cr
 
 CR
