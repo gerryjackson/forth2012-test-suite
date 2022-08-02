@@ -38,8 +38,7 @@ variable #errors    0 #errors !
    
    cr cr .( ** System does not support floating point signed zero. **)
    cr    .( ** Therefore these tests have been skipped **) cr
-   : goto-eof begin refill 0= until ;  goto-eof
-[THEN]
+[ELSE]
 
 verbose @ [IF]
   cr cr .( System supports fp signed zero. )
@@ -65,5 +64,5 @@ cr .( #ERRORS: ) #errors @ . cr
 [THEN]
 
 CR .( End of fpzero-test.4th) CR
-
+[THEN]
 
