@@ -465,37 +465,8 @@ T{ RND-TEST-BLOCK DUP TL3 DUP TL5 EVALUATE = -> TRUE }T
     TL5 WRITE-BLOCK ;
 T{ 2RND-TEST-BLOCKS 2DUP TL6 SWAP LOAD = -> TRUE }T
 
-\ LOAD changes the currect block that is effected by UPDATE
-\ This test needs at least 2 distinct buffers, though this is not a
-\ requirement of the language specification.  If 2 distinct buffers
-\ are not returned, then the tests quits with a trivial Pass
-: TL7 ( blk1 blk2 -- u1 u2 rnd2 blk2-addr rnd1' rnd1 )
-    OVER BUFFER OVER BUFFER = IF        \ test needs 2 distinct buffers
-        2DROP 0 0 0 0 0 0               \ Dummy result
-    ELSE
-        OVER BLOCK-RND DUP ROT TL1 >R   \ blk1 blk2
-        DUP S" SOURCE DROP" WRITE-BLOCK \ blk1 blk2
-        \ change blk1 to a new rnd, but don't UPDATE
-        OVER BLANK-BUFFER               \ blk1 blk2 blk1-addr
-        BLOCK-RND DUP >R                \ blk1 blk2 blk1-addr rnd1'
-        0 <# #S #>                      \ blk1 blk2 blk1-addr c-addr u
-        ROT SWAP CHARS MOVE             \ blk1 blk2
-        \ Now LOAD blk2
-        DUP LOAD DUP >R                 \ blk1 blk2 blk2-addr
-        \ Write a new blk2
-        DUP 1024 BL FILL                \ blk1 blk2 blk2-addr
-        BLOCK-RND DUP >R                \ blk1 blk2 blk2-addr rnd2
-        0 <# #S #>                      \ blk1 blk2 blk2-addr c-addr u
-        ROT SWAP CHARS MOVE             \ blk1 blk2
-        \ The following UPDATE should refer to the LOADed blk2, not blk1
-        UPDATE FLUSH                    \ blk1 blk2
-        \ Finally, load both blocks then collect all results
-        LOAD SWAP LOAD                  \ u2 u1
-        R> R> R> R>                     \ u2 u1 rnd2 blk2-addr rnd1' rnd1
-    THEN ;
-T{ 2RND-TEST-BLOCKS TL7                 \ run test procedure
-   SWAP DROP SWAP DROP                  \ u2 u1 rnd2 rnd1
-   2= -> TRUE }T
+\ A test of the effect of LOAD on UPDATE has been deleted
+\ as unjustified by the Forth Standard - See Issue #37
 
 \ I would expect LOAD to work on the contents of the buffer cache
 \ and not the block device, but the specification doesn't say.
