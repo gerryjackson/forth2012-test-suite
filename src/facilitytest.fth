@@ -43,7 +43,7 @@ T{ BEGIN-STRUCTURE STRCT2
       1 CELLS +FIELD F24
    END-STRUCTURE   -> }T
 
-T{ STRCT2 -> 3 chars 1 cells + }T   \ +FIELD doesn't align
+T{ STRCT2 -> 3 CHARS 1 CELLS + }T   \ +FIELD doesn't align
 T{ 0 F21 -> 0 }T
 T{ 0 F22 -> 1 }T
 T{ 0 F23 -> 3 }T
