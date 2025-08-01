@@ -540,7 +540,7 @@ VARIABLE UfNGrad
 	."     E0 and PseudoZero tell whether underflow is abrupt, gradual, or fuzzy." cr
 	."     V = an overflow threshold, roughly." cr
 	."     V0  tells, roughly, whether  Infinity  is represented." cr
-	."     Comparisions are checked for consistency with subtraction" cr
+	."     Comparisons are checked for consistency with subtraction" cr
 	." and for contamination with pseudo-zeros." cr
 	."     Sqrt is tested.  Y^X is not tested." cr
 	."     Extra-precise subexpressions are revealed but NOT YET tested." cr
@@ -2319,7 +2319,7 @@ FVARIABLE XB
 	." What message and/or values does Division by Zero produce?" cr
 
 	NOPAUSE 0= IF
-		." This can interupt your program.  You can "
+		." This can interrupt your program.  You can "
 		." skip this part if you wish." cr
 		." Do you wish to compute 1 / 0? "
 		KEY

@@ -66,7 +66,7 @@ error.
 [THEN]
 
 [UNDEFINED] +nan [IF]
-\ FABS is not superflous here, because the sign of 0/0 is not
+\ FABS is not superfluous here, because the sign of 0/0 is not
 \ specified by IEEE, and is actually different in Mac OS X
 \ ppc/intel (+/-), both for gforth and pfe.  Note that IEEE-2008
 \ does not require that 0/0 be a nan with zero load:

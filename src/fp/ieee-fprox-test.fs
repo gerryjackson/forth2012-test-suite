@@ -51,7 +51,7 @@ error.
 1e 0e f/ fabs fconstant +inf
 +inf fnegate  fconstant -inf
 
-\ FABS is not superflous here, because the sign of 0/0 is not
+\ FABS is not superfluous here, because the sign of 0/0 is not
 \ specified by IEEE, and is actually different in Mac OS X
 \ ppc/intel (+/-), both for gforth and pfe:
 

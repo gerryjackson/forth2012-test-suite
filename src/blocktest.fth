@@ -133,7 +133,7 @@ BITS/CELL 16 = [?IF]
 [?THEN]
 
 [?DEF] PRNG-RND
-\?  .( You need to add a Psuedo Random Number Generator for your cell size: )
+\?  .( You need to add a Pseudo Random Number Generator for your cell size: )
 \?  BITS/CELL U. CR
 \?  ABORT
 [?THEN]
@@ -446,7 +446,7 @@ T{ RND-TEST-BLOCK DUP TL3 DUP LOAD = -> TRUE }T
     S" EVALUATE-BLK@" WRITE-BLOCK ;
 T{ RND-TEST-BLOCK DUP TL4 LOAD -> 0 }T
 
-\ EVALUTE can nest with LOAD
+\ EVALUATE can nest with LOAD
 \ u: "BLK @"; S" u LOAD" EVALUATE
 : TL5 ( blk -- c-addr u )
     0 <#                       \ blk 0
@@ -551,7 +551,7 @@ T{ RND-TEST-BLOCK DUP TIN LOAD -> 1 3 }T
 \ ------------------------------------------------------------------------------
 TESTING \, SAVE-INPUT, RESTORE-INPUT and REFILL from a block source
 
-\ Try to determine the number of charaters per line
+\ Try to determine the number of characters per line
 \ Assumes an even number of characters per line
 : | ( u -- u-2 ) 2 - ;
 : C/L-CALC ( blk -- c/l )
