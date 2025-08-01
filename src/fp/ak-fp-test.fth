@@ -251,7 +251,7 @@ T{ -10E-1 f>d -> -1. }T
 TESTING FRACTIONAL ARITHMETICS
 DECIMAL
 
-: F=    ( r1 r2 -- flag, true if exact identitiy )
+: F=    ( r1 r2 -- flag, true if exact identity )
   0E f~ ;
 
 : TF=   ( r1 r2 -- flag, true if abs. error < 0.00005 )
